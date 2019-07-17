@@ -10,7 +10,6 @@ withEnv([
             defaultPipeline.getSource()
             defaultPipeline.runPhpLibTests()
             defaultPipeline.runSonar("php")
-            defaultPipeline.runPhpIntegrationTests()
 
             if (env.BRANCH_NAME in ["master"]) {
                 defaultPipeline.publishPhpPackage()
