@@ -1,0 +1,17 @@
+imports:
+    - { resource: '../Infrastructure/Resources/config/jms_serializer.yaml' }
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Kununu\Projections\Infrastructure\:
+        resource: '../../../../src/Infrastructure/*'
+        bind:
+            $cachePool: '@app.cache.projections'
+        public: true
+
+    app.cache.projections.tagged:
+        class: Symfony\Component\Cache\Adapter\TagAwareAdapter
+        decorates: 'app.cache.projections'
