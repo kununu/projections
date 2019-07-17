@@ -1,6 +1,0 @@
-jms_serializer:
-    metadata:
-        directories:
-            projections:
-                namespace_prefix: "Kununu\\Projections\\Tests\\Functional\\App\\Infrastructure"
-                path: "%kernel.root_dir%/Infrastructure/Resources/config/serializer"

@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Kununu\Projections\Tests\Functional\Infrastructure\Projection;
+namespace Kununu\Projections\Tests\Functional\Repository;
 
-use Kununu\Projections\Infrastructure\CachePoolProjectionRepository;
+use Kununu\Projections\Repository\CachePoolProjectionRepository;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
-use Kununu\Projections\Tests\Functional\App\Infrastructure\ProjectionItemStub;
+use Kununu\Projections\Tests\Functional\App\Repository\ProjectionItemStub;
 use Kununu\TestingBundle\Test\FixturesAwareTestCase;
 
 final class CachePoolProjectionRepositoryTest extends FixturesAwareTestCase

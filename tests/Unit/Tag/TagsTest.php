@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kununu\ProjectionsTests\Unit\Tag;
+namespace Kununu\Projections\Tests\Unit\Tag;
 
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;

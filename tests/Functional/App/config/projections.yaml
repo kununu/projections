@@ -1,13 +1,13 @@
 imports:
-    - { resource: '../Infrastructure/Resources/config/jms_serializer.yaml' }
+    - { resource: '../Repository/Resources/config/jms_serializer.yaml' }
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
 
-    Kununu\Projections\Infrastructure\:
-        resource: '../../../../src/Infrastructure/*'
+    Kununu\Projections\Repository\:
+        resource: '../../../../src/Repository/*'
         bind:
             $cachePool: '@app.cache.projections'
         public: true

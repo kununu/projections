@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kununu\Projections\Infrastructure;
+namespace Kununu\Projections\Repository;
 
 use Kununu\Projections\ProjectionItem;
 use Kununu\Projections\ProjectionRepository;
@@ -13,12 +13,11 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 final class CachePoolProjectionRepository implements ProjectionRepository
 {
     private $cachePool;
-
     private $serializer;
 
     public function __construct(TagAwareAdapterInterface $cachePool, SerializerInterface $serializer)
     {
-        $this->cachePool = $cachePool;
+        $this->cachePool  = $cachePool;
         $this->serializer = $serializer;
     }
 

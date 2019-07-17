@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kununu\Projections\Tests\Unit\Infrastructure;
+namespace Kununu\Projections\Tests\Unit\Repository;
 
 use Psr\Cache\CacheItemInterface;
 
@@ -62,11 +62,6 @@ final class CacheItemStub implements CacheItemInterface
         $this->tags = $tags;
 
         return $this;
-    }
-
-    public function getMetadata(): array
-    {
-        return [];
     }
 
     public function getTags() : array

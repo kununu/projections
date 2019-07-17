@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Kununu\Projections\Tests\Unit\Infrastructure;
+namespace Kununu\Projections\Tests\Unit\Repository;
 
-use Kununu\Projections\Infrastructure\CachePoolProjectionRepository;
+use Kununu\Projections\Repository\CachePoolProjectionRepository;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
 use JMS\Serializer\SerializerInterface;

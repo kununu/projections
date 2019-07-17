@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Kununu\Projections\Tests\Unit\Infrastructure;
+namespace Kununu\Projections\Tests\Unit\Repository;
 
 use Kununu\Projections\ProjectionItem;
 use Kununu\Projections\Tag\Tag;
