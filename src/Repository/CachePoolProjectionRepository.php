@@ -12,6 +12,8 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 
 final class CachePoolProjectionRepository implements ProjectionRepository
 {
+    private const JMS_SERIALIZER_FORMAT = 'json';
+
     private $cachePool;
     private $serializer;
 
@@ -54,7 +56,7 @@ final class CachePoolProjectionRepository implements ProjectionRepository
             return null;
         }
 
-        return $this->serializer->deserialize($cacheItem->get(), get_class($item), 'json');
+        return $this->serializer->deserialize($cacheItem->get(), get_class($item), self::JMS_SERIALIZER_FORMAT);
     }
 
     public function delete(ProjectionItem $item): void
@@ -74,7 +76,7 @@ final class CachePoolProjectionRepository implements ProjectionRepository
     private function createCacheItem(ProjectionItem $item): CacheItemInterface
     {
         $cacheItem = $this->cachePool->getItem($item->getKey());
-        $cacheItem->set($this->serializer->serialize($item, 'json'));
+        $cacheItem->set($this->serializer->serialize($item, self::JMS_SERIALIZER_FORMAT));
         $cacheItem->tag($item->getTags()->raw());
 
         return $cacheItem;

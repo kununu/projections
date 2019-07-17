@@ -23,7 +23,7 @@ final class Tags
     {
         $value = $tag->value();
 
-        if (array_key_exists($value, $this->tagsAsStrings)) {
+        if (isset($this->tagsAsStrings[$value])) {
             return;
         }
 
