@@ -1,0 +1,7 @@
+imports:
+    - { resource: projections.yaml }
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
