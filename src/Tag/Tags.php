@@ -2,7 +2,7 @@
 
 namespace Kununu\Projections\Tag;
 
-final class Tags
+class Tags
 {
     private $tags = [];
     private $tagsAsStrings = [];
