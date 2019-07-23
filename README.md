@@ -99,104 +99,103 @@ This holds methods to get, add and delete the projections. The methods are used 
     Right now there is only an implementation of a repository, which projects the items using Symfony's Tag Aware Cache Pool component.
     This repository is called `CachePoolProjectionRepository`
 
-2.1. Implementation of `CachePoolProjectionRepository`
-
-Besides the Symfony's Tag Aware Cache Pool interface, this repository uses the JMS Serializer. The following snippet is the repository's constructor.
-```
-public function __construct(TagAwareAdapterInterface $cachePool, SerializerInterface $serializer)
-{
-    $this->cachePool  = $cachePool;
-    $this->serializer = $serializer;
-}
-```
-
-So there is the need to define the serialization config for the Projection items. For instance, for the previous `ExampleProjectionItem` example, here is an example of the JMS Serializer XML config for this class:
-```
-<?xml version="1.0" encoding="UTF-8" ?>
-<serializer>
-    <class name="Kununu\Example\ExampleProjectionItem">
-        <property name="id" type="string"></property>
-        <property name="someValue" type="string"></property>
-    </class>
-</serializer>
-```
-This should be saved in a `ExampleProjectionItem.xml` file.
-
-The data that you want projected needs exist on the serializer config in order to be actually projected. In this example you can see that the two properties of the projection item are on the config.
-
-This configuration needs to be loaded into the JMS Serializer and the repository needs to be instantiated in order to be used.
-
-2.1.1 Usage with Symfony ^4.0
-Create a cache pool with Symfony config. Here's an example for the cache pool to use Memcached:
-```
-framework:
-    cache:
-        prefix_seed: "example"
-        default_memcached_provider: "memcached://172.0.0.1:1121"
-        pools:
-            example.cache.projections:
-                adapter: cache.adapter.memcached
-                default_lifetime: 3600
-
-```
-This automatically creates a `example.cache.projections` service. In this case the lifetime for the projections is 3600 seconds = 1 hour.
-
-Here is assumed that the `jms/serializer-bundle` was required. The minimum configuration you need for the JMS Serializer Bundle is:
-```
-jms_serializer:
-    default_context:
-        serialization:
-            serialize_null: true
-    metadata:
-        directories:
-            projections:
-                namespace_prefix: "Kununu\Example"
-                path: "%kernel.root_dir%/Repository/Resources/config/serializer"
-```
-
-where `%kernel.root_dir%/Repository/Resources/config/serializer` is the directory where is the JMS Serializer configuration files for the projection items, which means the previous `ExampleProjectionItem.xml` file is inside.
-Please notice that the namespace prefix of the projection item class is also defined in here.
-
-Next define the `CachePoolProjectionRepository` as a Symfony service:
-```
-services:
-    _defaults:
-        autowire: true
-        autoconfigure: true
-
-    Kununu/Projections/Repository/CachePoolProjectionRepository:
-        class: Kununu\Projections\Repository\CachePoolProjectionRepository
-        arguments:
-            - '@example.cache.projections'
-            - '@jms_serializer'
-
-    example.cache.projections.tagged:
-        class: Symfony\Component\Cache\Adapter\TagAwareAdapter
-        decorates: 'example.cache.projections'
-```
-Note that the `TagAwareAdapter` is added as a decorator for the cache pool service.
-
-Now you can inject the repository's service. Example:
-```
-    App\Infrastructure\UseCase\Query\GetProfileCommonByUuid\DataProvider\ProjectionDataProvider:
-        arguments:
-            - '@Kununu/Projections/Repository/CachePoolProjectionRepository'
-
-```
-
-And inside the respective class we should depend only on the `ProjectionRepository` interface.
-```
-class ProjectionDataProvider
-{
-    private $projectionRepository;
-
-    public function __construct(ProjectionRepository $projectionRepository)
+### Using `CachePoolProjectionRepository`
+1. Besides the Symfony's Tag Aware Cache Pool interface, this repository uses the JMS Serializer. The following snippet is the repository's constructor.
+    ```
+    public function __construct(TagAwareAdapterInterface $cachePool, SerializerInterface $serializer)
     {
-        $this->projectionRepository = $projectionRepository;
+        $this->cachePool  = $cachePool;
+        $this->serializer = $serializer;
     }
+    ```
+    
+    So there is the need to define the serialization config for the Projection items. For instance, for the previous `ExampleProjectionItem` example, here is an example of the JMS Serializer XML config for this class:
+    ```
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <serializer>
+        <class name="Kununu\Example\ExampleProjectionItem">
+            <property name="id" type="string"></property>
+            <property name="someValue" type="string"></property>
+        </class>
+    </serializer>
+    ```
+    This should be saved in a `ExampleProjectionItem.xml` file.
+    
+    The data that you want projected needs exist on the serializer config in order to be actually projected. In this example you can see that the two properties of the projection item are on the config.
+    
+    This configuration needs to be loaded into the JMS Serializer and the repository needs to be instantiated in order to be used.
 
-    ...
-}
-```
-
-Now we can start reading, setting and deleting from the cache pool :)
+2. Usage with Symfony ^4.0
+    Create a cache pool with Symfony config. Here's an example for the cache pool to use Memcached:
+    ```
+    framework:
+        cache:
+            prefix_seed: "example"
+            default_memcached_provider: "memcached://172.0.0.1:1121"
+            pools:
+                example.cache.projections:
+                    adapter: cache.adapter.memcached
+                    default_lifetime: 3600
+    
+    ```
+    This automatically creates a `example.cache.projections` service. In this case the lifetime for the projections is 3600 seconds = 1 hour.
+    
+    Here is assumed that the `jms/serializer-bundle` was required. The minimum configuration you need for the JMS Serializer Bundle is:
+    ```
+    jms_serializer:
+        default_context:
+            serialization:
+                serialize_null: true
+        metadata:
+            directories:
+                projections:
+                    namespace_prefix: "Kununu\Example"
+                    path: "%kernel.root_dir%/Repository/Resources/config/serializer"
+    ```
+    
+    where `%kernel.root_dir%/Repository/Resources/config/serializer` is the directory where is the JMS Serializer configuration files for the projection items, which means the previous `ExampleProjectionItem.xml` file is inside.
+    Please notice that the namespace prefix of the projection item class is also defined in here.
+    
+    Next define the `CachePoolProjectionRepository` as a Symfony service:
+    ```
+    services:
+        _defaults:
+            autowire: true
+            autoconfigure: true
+    
+        Kununu/Projections/Repository/CachePoolProjectionRepository:
+            class: Kununu\Projections\Repository\CachePoolProjectionRepository
+            arguments:
+                - '@example.cache.projections'
+                - '@jms_serializer'
+    
+        example.cache.projections.tagged:
+            class: Symfony\Component\Cache\Adapter\TagAwareAdapter
+            decorates: 'example.cache.projections'
+    ```
+    Note that the `TagAwareAdapter` is added as a decorator for the cache pool service.
+    
+    Now you can inject the repository's service. Example:
+    ```
+        App\Infrastructure\UseCase\Query\GetProfileCommonByUuid\DataProvider\ProjectionDataProvider:
+            arguments:
+                - '@Kununu/Projections/Repository/CachePoolProjectionRepository'
+    
+    ```
+    
+    And inside the respective class we should depend only on the `ProjectionRepository` interface.
+    ```
+    class ProjectionDataProvider
+    {
+        private $projectionRepository;
+    
+        public function __construct(ProjectionRepository $projectionRepository)
+        {
+            $this->projectionRepository = $projectionRepository;
+        }
+    
+        ...
+    }
+    ```
+    
+    Now we can start reading, setting and deleting from the cache pool :)
