@@ -45,7 +45,7 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
 
 1. A projection is represented by an object that implements `ProjectionItem` interface. This object is called **projection item** and holds on its properties the data to be projected.
 
-Here's an example of projection item:
+    Here's an example of projection item:
 
     ```
     namespace Kununu\Example;
@@ -78,7 +78,8 @@ Here's an example of projection item:
 
 2. The **projection item** is projected through a repository which implements `ProjectionRepository` interface.
 
-This holds methods to get, add and delete the projections. The methods are used by passing a **projection item** object.
+    This holds methods to get, add and delete the projections. The methods are used by passing a **projection item** object.
+
     ```
     interface ProjectionRepository
     {
