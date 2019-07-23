@@ -46,6 +46,7 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
 1. A projection is represented by an object that implements `ProjectionItem` interface. This object is called **projection item** and holds on its properties the data to be projected.
 
 Here's an example of projection item:
+
     ```
     namespace Kununu\Example;
 
