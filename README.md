@@ -1,12 +1,15 @@
 # Kununu Projections
 
 Projections are a temporary storage and are a way to access data faster than fetching it from a regular storage.
+
 Data needs to be projected first, so then it's projection can be accessed, without the need to access the actual source of truth, which is usually a slower process.
+
 Projections have a short lifetime, and are not updated automatically if data in source of truth changes. So they need to be frequently refreshed.
 
 ## Overview
 
 This repository contains the interfaces to implement projections logic.
+
 It also includes an implementation of the projection over the Symfony's Tag Aware Cache Pool component, which can use several cache providers, like Memcached, Redis or simply process memory, amongst others.
 
 ## Installation
@@ -41,6 +44,7 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
 ## Usage
 
 1. A projection is represented by an object that implements `ProjectionItem` interface. This object is called **projection item** and holds on its properties the data to be projected.
+
 Here's an example of projection item:
     ```
     namespace Kununu\Example;
@@ -72,6 +76,7 @@ Here's an example of projection item:
     The `getTags()` method serves to mark the projection item with a tag. These can be used later for bulk operations on projections, like delete all projections with a certain tag.
 
 2. The **projection item** is projected through a repository which implements `ProjectionRepository` interface.
+
 This holds methods to get, add and delete the projections. The methods are used by passing a **projection item** object.
     ```
     interface ProjectionRepository
@@ -154,6 +159,7 @@ This holds methods to get, add and delete the projections. The methods are used 
     ```
     
     where `%kernel.root_dir%/Repository/Resources/config/serializer` is the directory where is the JMS Serializer configuration files for the projection items, which means the previous `ExampleProjectionItem.xml` file is inside.
+    
     Please notice that the namespace prefix of the projection item class is also defined in here.
     
     Next define the `CachePoolProjectionRepository` as a Symfony service:
