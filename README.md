@@ -74,7 +74,7 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
     ```
     The `getKey()` and `getTags()` methods must be implemented.
     
-    The `getKey()` method is the unique identifier of the projection. If a projections are stored with the same key then they will be overridden.
+    The `getKey()` method is the unique identifier of the projection. If projections are stored with the same key then they will be overridden.
     
     The `getTags()` method serves to mark the projection item with a tag. These can be used later for bulk operations on projections, like delete all projections with a certain tag.
 
