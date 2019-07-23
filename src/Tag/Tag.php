@@ -2,7 +2,7 @@
 
 namespace Kununu\Projections\Tag;
 
-class Tag
+final class Tag
 {
     private $tag;
 

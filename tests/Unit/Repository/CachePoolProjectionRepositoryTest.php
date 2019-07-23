@@ -2,6 +2,7 @@
 
 namespace Kununu\Projections\Tests\Unit\Repository;
 
+use Kununu\Projections\Exception\ProjectionException;
 use Kununu\Projections\Repository\CachePoolProjectionRepository;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
@@ -51,7 +52,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
 
     public function testWhenAddFails(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to add projection item on cache pool');
 
         $item = new ProjectionItemDummy('id_item');
@@ -115,7 +116,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
 
     public function testWhenAddDeferredFails(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to save deferred projection item on cache pool');
 
         $item = new ProjectionItemDummy('id_item');
@@ -212,7 +213,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
 
     public function testWhenDeleteFails(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to delete projection item on cache pool');
 
         $this->cachePool
@@ -240,7 +241,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
 
     public function testWhenFlushFails(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to add projection items on cache pool by flush');
 
         $this->cachePool
@@ -266,7 +267,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
 
     public function testWhenDeleteByTagsFails(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to delete projection items on cache pool based on tag');
 
         $this->cachePool

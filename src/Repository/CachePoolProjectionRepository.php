@@ -2,12 +2,12 @@
 
 namespace Kununu\Projections\Repository;
 
+use Kununu\Projections\Exception\ProjectionException;
 use Kununu\Projections\ProjectionItem;
 use Kununu\Projections\ProjectionRepository;
 use Kununu\Projections\Tag\Tags;
 use JMS\Serializer\SerializerInterface;
 use Psr\Cache\CacheItemInterface;
-use RuntimeException;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 
 final class CachePoolProjectionRepository implements ProjectionRepository
@@ -28,7 +28,7 @@ final class CachePoolProjectionRepository implements ProjectionRepository
         $cacheItem = $this->createCacheItem($item);
 
         if (!$this->cachePool->save($cacheItem)) {
-            throw new RuntimeException('Not possible to add projection item on cache pool');
+            throw new ProjectionException('Not possible to add projection item on cache pool');
         }
     }
 
@@ -37,14 +37,14 @@ final class CachePoolProjectionRepository implements ProjectionRepository
         $cacheItem = $this->createCacheItem($item);
 
         if (!$this->cachePool->saveDeferred($cacheItem)) {
-            throw new RuntimeException('Not possible to save deferred projection item on cache pool');
+            throw new ProjectionException('Not possible to save deferred projection item on cache pool');
         }
     }
 
     public function flush(): void
     {
         if (!$this->cachePool->commit()) {
-            throw new RuntimeException('Not possible to add projection items on cache pool by flush');
+            throw new ProjectionException('Not possible to add projection items on cache pool by flush');
         }
     }
 
@@ -62,14 +62,14 @@ final class CachePoolProjectionRepository implements ProjectionRepository
     public function delete(ProjectionItem $item): void
     {
         if (!$this->cachePool->deleteItem($item->getKey())) {
-            throw new RuntimeException('Not possible to delete projection item on cache pool');
+            throw new ProjectionException('Not possible to delete projection item on cache pool');
         }
     }
 
     public function deleteByTags(Tags $tags): void
     {
         if (!$this->cachePool->invalidateTags($tags->raw())) {
-            throw new RuntimeException('Not possible to delete projection items on cache pool based on tag');
+            throw new ProjectionException('Not possible to delete projection items on cache pool based on tag');
         }
     }
 
