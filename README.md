@@ -20,7 +20,7 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
         ...
         {
           "type": "vcs",
-          "url": "https://github.com/kununu/hermes.git",
+          "url": "https://github.com/kununu/projections.git",
           "no-api": true
         }
       ]
@@ -153,9 +153,6 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
     Here is assumed that the `jms/serializer-bundle` was required. The minimum configuration you need for the JMS Serializer Bundle is:
     ```
     jms_serializer:
-        default_context:
-            serialization:
-                serialize_null: true
         metadata:
             directories:
                 projections:
