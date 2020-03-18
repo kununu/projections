@@ -2,13 +2,15 @@
 
 namespace Kununu\Projections\Tests\Unit\Repository;
 
-use Kununu\Projections\Exception\ProjectionException;
-use Kununu\Projections\Repository\CachePoolProjectionRepository;
-use Kununu\Projections\Tag\Tag;
-use Kununu\Projections\Tag\Tags;
 use JMS\Serializer\SerializerInterface;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Kununu\Projections\{
+    Exception\ProjectionException,
+    Repository\CachePoolProjectionRepository,
+    Tag\Tag,
+    Tag\Tags};
+use PHPUnit\Framework\{
+    MockObject\MockObject,
+    TestCase};
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 
 final class CachePoolProjectionRepositoryTest extends TestCase
@@ -47,6 +49,47 @@ final class CachePoolProjectionRepositoryTest extends TestCase
         $cachePoolProjectionRepository->add($item);
 
         $this->assertEquals('serialized_projection_item_dummy', $cacheItemStub->get());
+        $this->assertEquals(['test', 'kununu', 'id_item'], $cacheItemStub->getTags());
+    }
+
+    public function testAddIteamArrayData(): void
+    {
+        $cacheItemStub = new CacheItemStub();
+
+        $item = new ProjectionItemArrayDataDummy('id_item');
+        $item->setStuff('itn');
+        $item->storeData(['id' => 'beiga', 'value' => 1000]);
+
+        $this->cachePool
+            ->expects($this->once())
+            ->method('getItem')
+            ->with('test_item_array_data_id_item')
+            ->willReturn($cacheItemStub);
+
+        $this->cachePool
+            ->expects($this->once())
+            ->method('save')
+            ->willReturn(true);
+
+        $this->serializer
+            ->expects($this->once())
+            ->method('serialize')
+            ->with($item, 'json')
+            ->willReturnCallback(function (ProjectionItemArrayDataDummy $item): string {
+                return json_encode([
+                    'key'   => $item->getKey(),
+                    'stuff' => $item->getStuff(),
+                    'data'  => $item->data(),
+                ]);
+            });
+
+        $cachePoolProjectionRepository = new CachePoolProjectionRepository($this->cachePool, $this->serializer);
+        $cachePoolProjectionRepository->add($item);
+
+        $this->assertEquals(
+            '{"key":"test_item_array_data_id_item","stuff":"itn","data":{"id":"beiga","value":1000}}',
+            $cacheItemStub->get()
+        );
         $this->assertEquals(['test', 'kununu', 'id_item'], $cacheItemStub->getTags());
     }
 

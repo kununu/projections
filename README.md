@@ -77,8 +77,24 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
     The `getKey()` method is the unique identifier of the projection. If projections are stored with the same key then they will be overridden.
     
     The `getTags()` method serves to mark the projection item with a tag. These can be used later for bulk operations on projections, like delete all projections with a certain tag.
+    
+2. The package also offers an extension of `ProjectionItem` designed to store generic data (the data itself will be any PHP iterable, like an array).
 
-2. The **projection item** is projected through a repository which implements `ProjectionRepository` interface.
+	The interface is `ProjectionItemWithData` and must implement the following methods:
+
+    ```
+    interface ProjectionItemWithData extends ProjectionItem
+    {
+        public function storeData(iterable $data): ProjectionItemArrayData;
+
+        public function data(): iterable;
+    }
+    ```
+	An abstract base class called `AbstractProjectionItemWithData` is provided with those methods already implemented and with the data stored as an array, so just expand your item classes from that class and you're good to go.
+
+    Just bear in mind that that class is still expecting an implementation of `ProjectionItem` so it is still responsability of your subclass to implement this!
+
+3. The **projection item** is projected through a repository which implements `ProjectionRepository` interface.
 
     This holds methods to get, add and delete the projections. The methods are used by passing a **projection item** object.
 

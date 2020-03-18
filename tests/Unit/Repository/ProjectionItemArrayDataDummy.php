@@ -2,13 +2,15 @@
 
 namespace Kununu\Projections\Tests\Unit\Repository;
 
-use Kununu\Projections\ProjectionItem;
-use Kununu\Projections\Tag\Tag;
-use Kununu\Projections\Tag\Tags;
+use Kununu\Projections\{
+    AbstractProjectionItemWithData,
+    ProjectionItem,
+    Tag\Tag,
+    Tag\Tags};
 
-final class ProjectionItemDummy implements ProjectionItem
+final class ProjectionItemArrayDataDummy extends AbstractProjectionItemWithData
 {
-    private const PROJECTION_KEY = 'test_%s';
+    private const PROJECTION_KEY = 'test_item_array_data_%s';
 
     protected $id;
 
