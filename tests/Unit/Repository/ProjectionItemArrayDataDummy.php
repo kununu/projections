@@ -3,12 +3,12 @@
 namespace Kununu\Projections\Tests\Unit\Repository;
 
 use Kununu\Projections\{
-    AbstractProjectionItemWithData,
+    AbstractProjectionItemIterable,
     ProjectionItem,
     Tag\Tag,
     Tag\Tags};
 
-final class ProjectionItemArrayDataDummy extends AbstractProjectionItemWithData
+final class ProjectionItemArrayDataDummy extends AbstractProjectionItemIterable
 {
     private const PROJECTION_KEY = 'test_item_array_data_%s';
 

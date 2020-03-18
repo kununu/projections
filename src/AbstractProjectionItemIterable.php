@@ -2,11 +2,11 @@
 
 namespace Kununu\Projections;
 
-abstract class AbstractProjectionItemWithData implements ProjectionItemWithData
+abstract class AbstractProjectionItemIterable implements ProjectionItemIterable
 {
     private $data;
 
-    public function storeData(iterable $data): ProjectionItemWithData
+    public function storeData(iterable $data): ProjectionItemIterable
     {
         $this->data = $data;
 
