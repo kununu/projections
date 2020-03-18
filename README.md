@@ -90,9 +90,9 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
         public function data(): iterable;
     }
     ```
-	An abstract base class called `AbstractProjectionItemIterable` is provided with those methods already implemented and with the data stored as an array, so just expand your item classes from that class and you're good to go.
+	A trait called `ProjectionItemIterableTrait` is provided with those methods already implemented and with the data stored as an array, so just use it your projection item classes and you're good to go.
 
-    Just bear in mind that that class is still expecting an implementation of `ProjectionItem` so it is still responsibility of your subclass to implement this!
+    Just bear in mind that the trait is only implementing the methods defined in `ProjectionItemIterable` and not those of `ProjectionItem` so it is still responsibility of your projection item class to implement them!
 
 3. The **projection item** is projected through a repository which implements `ProjectionRepository` interface.
 

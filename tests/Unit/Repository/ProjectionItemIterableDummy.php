@@ -3,13 +3,16 @@
 namespace Kununu\Projections\Tests\Unit\Repository;
 
 use Kununu\Projections\{
-    AbstractProjectionItemIterable,
     ProjectionItem,
+    ProjectionItemIterable,
+    ProjectionItemIterableTrait,
     Tag\Tag,
     Tag\Tags};
 
-final class ProjectionItemIterableDummy extends AbstractProjectionItemIterable
+final class ProjectionItemIterableDummy implements ProjectionItemIterable
 {
+    use ProjectionItemIterableTrait;
+
     private const PROJECTION_KEY = 'test_item_iterable_%s';
 
     protected $id;
