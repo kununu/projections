@@ -56,14 +56,14 @@ final class CachePoolProjectionRepositoryTest extends TestCase
     {
         $cacheItemStub = new CacheItemStub();
 
-        $item = new ProjectionItemArrayDataDummy('id_item');
+        $item = new ProjectionItemIterableDummy('id_item');
         $item->setStuff('itn');
         $item->storeData(['id' => 'beiga', 'value' => 1000]);
 
         $this->cachePool
             ->expects($this->once())
             ->method('getItem')
-            ->with('test_item_array_data_id_item')
+            ->with('test_item_iterable_id_item')
             ->willReturn($cacheItemStub);
 
         $this->cachePool
@@ -75,7 +75,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
             ->expects($this->once())
             ->method('serialize')
             ->with($item, 'json')
-            ->willReturnCallback(function (ProjectionItemArrayDataDummy $item): string {
+            ->willReturnCallback(function (ProjectionItemIterableDummy $item): string {
                 return json_encode([
                     'key'   => $item->getKey(),
                     'stuff' => $item->getStuff(),
@@ -87,7 +87,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
         $cachePoolProjectionRepository->add($item);
 
         $this->assertEquals(
-            '{"key":"test_item_array_data_id_item","stuff":"itn","data":{"id":"beiga","value":1000}}',
+            '{"key":"test_item_iterable_id_item","stuff":"itn","data":{"id":"beiga","value":1000}}',
             $cacheItemStub->get()
         );
         $this->assertEquals(['test', 'kununu', 'id_item'], $cacheItemStub->getTags());

@@ -8,9 +8,9 @@ use Kununu\Projections\{
     Tag\Tag,
     Tag\Tags};
 
-final class ProjectionItemArrayDataDummy extends AbstractProjectionItemIterable
+final class ProjectionItemIterableDummy extends AbstractProjectionItemIterable
 {
-    private const PROJECTION_KEY = 'test_item_array_data_%s';
+    private const PROJECTION_KEY = 'test_item_iterable_%s';
 
     protected $id;
 
