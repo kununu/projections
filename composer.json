@@ -3,30 +3,19 @@
   "license": "proprietary",
   "description": "Kununu Projections",
   "minimum-stability": "stable",
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/kununu/data-fixtures.git",
-      "no-api": true
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/kununu/testing-bundle.git",
-      "no-api": true
-    }
-  ],
   "require": {
     "php": "^7.2"
   },
   "require-dev": {
     "ext-json": "*",
-    "phpunit/phpunit": "^8.2",
-    "symfony/framework-bundle": "~4.0",
-    "symfony/yaml": "~4.0",
-    "symfony/browser-kit": "~4.0",
-    "symfony/cache": "^4.0",
+    "phpunit/phpunit": "^8.5",
+    "symfony/framework-bundle": "^4.4",
+    "symfony/yaml": "^4.4",
+    "symfony/browser-kit": "^4.4",
+    "symfony/cache": "^4.4",
     "jms/serializer-bundle": "^2.0",
-    "kununu/testing-bundle": "^2.0"
+    "kununu/testing-bundle": "^13.0",
+    "kununu/scripts": "^2.0"
   },
   "suggest": {
     "symfony/cache": "^4.0",
