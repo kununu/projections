@@ -15,7 +15,7 @@
     "symfony/cache": "^4.4",
     "jms/serializer-bundle": "^2.0",
     "kununu/testing-bundle": "^13.0",
-    "kununu/scripts": "^2.0"
+    "kununu/scripts": "^3.0"
   },
   "suggest": {
     "symfony/cache": "^4.0",
