@@ -23,7 +23,6 @@
         <whitelist processUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">src/</directory>
             <exclude>
-                <directory>config</directory>
                 <directory>src/TestCase</directory>
             </exclude>
         </whitelist>
