@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kununu\Projections\Tests\Functional\Repository;
 
@@ -100,7 +101,7 @@ final class CachePoolProjectionRepositoryTest extends FixturesAwareTestCase
 
         $this->loadCachePoolFixtures('app.cache.projections', []);
 
-        $this->projectionRepository = self::getContainer()->get(CachePoolProjectionRepository::class);
+        $this->projectionRepository = $this->getFixturesContainer()->get(CachePoolProjectionRepository::class);
 
         $projectionItemStub = new ProjectionItemStub('an_identifier');
         $this->projectionRepository->add($projectionItemStub);
