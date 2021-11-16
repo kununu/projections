@@ -14,7 +14,7 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
 
 ## Installation
 
-### Add this repository to your project composer.json. Copy the following configuration
+### Add custom private repositories to composer.json
 
 ```json
 "repositories": [
@@ -325,6 +325,41 @@ $myClass->myMethod();
 
 ```
 
+##### AbstractCacheCleanerTestCase
+
+In order to help you unit testing your cache cleaners implementations the `AbstractCacheCleanerTestCase` exists for that purpose.
+
+Just make you test class extend it and override the `TAGS` constant and implement the `getCacheCleaner` method.
+
+Example:
+
+```php
+final class MyCacheCleanerTest extends AbstractCacheCleanerTestCase
+{
+    protected const TAGS = ['my-tag1', 'my-tag2'];
+
+    protected function getCacheCleaner(ProjectionRepository $projectionRepository, LoggerInterface $logger): CacheCleaner
+    {
+        // Return a new instance of your cache cleaner implementation
+        return new MyCacheCleaner($projectionRepository, $logger); 
+    }
+}
+```
+
+The `TAGS` constant must be the tags that you expect that your cache cleaner class will use.
+
+For the example above we are expecting that `MyCacheCleaner::getTags` will return a `Tags` collection with the same tags defined in the constant, e.g.:
+
+```php
+class MyCacheCleaner extends AbstractCacheCleanerByTags
+{
+    protected function getTags(): Tags
+    {
+        return new Tags(new Tag('my-tag1'), new Tag('my-tag2'));
+    }
+}
+```
+
 ### `CacheCleanerChain`
 
 What if you want to clear more than one cache/more than one set of tags? Easy, you create a `CacheCleanerChain`.
@@ -373,4 +408,157 @@ $myClass = new MyClass($cacheCleaner);
 // When I call `myMethod` it will clear all the caches as defined on each cleaner injected into the chain $cacheCleaner
 $myClass->myMethod();
 
+```
+
+### `AbstractCachedProvider`
+
+As projections are being used to project data to a cache provider we might end up having the need to create a "provider" for data that will check if the data is already on cache and if not try to fetch from the "real" source and then store it on cache (e.g. create a projection).
+
+We can even use the **Decorator** pattern to achieve this.
+
+Usually the flow is always the same.
+
+- Get item from the cache
+- Cache was hit? Return the data retrieved from cache
+- Cache was miss? Call the original provider to fetch the data
+  - Data was found?
+    - Store it on the cache
+    - Return the data
+- Rinse and repeat...
+
+So the `AbstractCachedProvider` will help you in reducing the boiler plate for those scenarios.
+
+Your "provider" class should extend it and for each method where you need to use the flow described above you just need to call the `getAndCacheData` method:
+
+```php
+protected function getAndCacheData(ProjectionItemIterable $item, callable $dataGetter): ?iterable;
+```
+
+- The `$item` parameter is a projection item that will be used to build the cache key
+- The `$dataGetter` is your custom function that should return an `iterable` with you data or null if no data was found
+
+An example:
+
+```php
+interface MyProviderInterface
+{
+    public function getCustomerData(int $customerId): ?iterable;
+}
+
+class MyProvider implements MyProviderInterface
+{
+    public function getCustomerData(int $customerId): ?iterable
+    {
+        // Let's grab the data from someplace (e.g. a database)...
+        $result = ...
+
+        return $result;
+    }
+}
+
+class MyCachedProvider extends AbstractCachedProvider implements MyProviderInterface
+{
+    private $myProvider;
+    
+    public function __construct(MyProviderInterface $myProvider, ProjectionRepository $projectionRepository, LoggerInterface $logger)
+    {
+        parent::__construct($projectionRepository, $logger);
+        $this->myProvider = $myProvider;
+    }
+    
+    public function getCustomerData(int $customerId): ?iterable
+    {
+        return $this->getAndCacheData(
+            new CustomerByIdProjectionItem($customerId),
+            function() use ($customerId): ?iterable {
+                return $this->myProvider->getCustomerData($customerId);
+            }
+        );        
+    }
+}
+
+$projectionRepository = // Get/build your projection/repository
+$logger = // Get/build your logger
+$myProvider = // Get/build your "original" provider
+
+$cachedProvider = new MyCachedProvider($myProvider, $projectionRepository, $logger);
+
+$data = $cachedProvider->getCustomerData(152);
+```
+
+#### CachedProviderTestCase
+
+In order to help you unit testing your cached providers implementations the `CachedProviderTestCase` exists for that purpose.
+
+Just make you test class extend it and override the `METHODS` constant and implement the `getProvider` method.
+
+The `getProvider` is were you should create the "decorated" cached provider you want to test. E.g:
+
+```php
+protected function getProvider($originalProvider): AbstractCachedProvider
+{
+    return new MyCachedProvider($originalProvider, $this->getProjectionRepository(), $this->getLogger());
+}
+```
+
+You don't need to mock the projection repository neither the logger. Just create an instance of your cached provider.
+
+The `$originalProvider` will be an instance/mock of your original provider.
+
+The `METHODS` constant should contain the methods of your provider class.
+
+For our example above to test the `getCustomerData` method:
+
+```php
+    protected const METHODS = [
+        'getCustomerData',
+    ];
+
+```
+
+Now, for each method defined in the `METHODS` constant you need to create a PHPUnit data provider method.
+
+So in this case you would have to create a method called `getCustomerDataDataProvider`:
+
+```php
+public function getCustomerDataDataProvider(): array
+{
+    return [
+        'my_test_case_1' => [
+            $originalProvider, // An instance/mock of your original provider 
+            $method, // Should be 'getCustomerData' as this is a test case for that method
+            $args, // Arguments to your method (int this case: [123 <- $customerId])
+            $item, // Projection item to search in cache (e.g. new CustomerByIdProjectionItem(123))
+            $projectedItem, // Projected item to be return by the projection repository (null to simulate a cache miss)
+            $expectedProviderData, // Expected result
+        ]
+    ]; 
+}
+```
+
+If you want to mock the original provider you can do it with the `createExternalProvider`:
+
+```php
+protected function createExternalProvider(string $providerClass, string $method, array $args, bool $expected, ?iterable $data);
+```
+
+- `$providerClass` - The class/interface of your original provider
+- `$method` - The method you are mocking
+- `$args` - The expected arguments to the method
+- `$expected` - If the call is expected to return data
+- `$data` - The data to return
+
+Example:
+
+```php
+$originalProvider = $this->createExternalProvider(
+    MyProviderInterface::class,
+    'getCustomerData',
+    [123],
+    true,
+    [
+        'id' => 123,
+        'name' => 'My Customer Name'
+    ]
+);
 ```
