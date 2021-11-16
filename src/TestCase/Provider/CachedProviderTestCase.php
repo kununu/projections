@@ -44,7 +44,7 @@ abstract class CachedProviderTestCase extends TestCase
         ];
 
         // Get from cache
-        ($projectionRepository = $this->getProjectionRepository())
+        ($repository = $this->getProjectionRepository())
             ->expects($this->once())
             ->method('get')
             ->with($item)
@@ -70,7 +70,7 @@ abstract class CachedProviderTestCase extends TestCase
 
             if (is_iterable($expectedProviderData)) {
                 // Get data from provider
-                $projectionRepository
+                $repository
                     ->expects($this->once())
                     ->method('add')
                     ->with((clone $item)->storeData($expectedProviderData));
