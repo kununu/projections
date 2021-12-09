@@ -14,9 +14,6 @@ abstract class CachedProviderTestCase extends TestCase
 {
     protected const METHODS = [];
 
-    private const CACHE_KEY = 'cache_key';
-    private const DATA = 'data';
-
     protected $projectionRepository;
     protected $logger;
 
@@ -28,7 +25,7 @@ abstract class CachedProviderTestCase extends TestCase
      * @param array                       $args
      * @param ProjectionItemIterable      $item
      * @param ProjectionItemIterable|null $projectedItem
-     * @param iterable|null               $expectedProviderData
+     * @param iterable|null               $providerData
      */
     public function testGetAndCacheData(
         $originalProvider,
@@ -36,13 +33,8 @@ abstract class CachedProviderTestCase extends TestCase
         array $args,
         ProjectionItemIterable $item,
         ?ProjectionItemIterable $projectedItem,
-        ?iterable $expectedProviderData
+        ?iterable $providerData
     ): void {
-        $loggerCalls[] = [
-            'Getting data from cache',
-            [self::CACHE_KEY => $item->getKey()],
-        ];
-
         // Get from cache
         ($repository = $this->getProjectionRepository())
             ->expects($this->once())
@@ -50,52 +42,18 @@ abstract class CachedProviderTestCase extends TestCase
             ->with($item)
             ->willReturn($projectedItem);
 
-        // Cache hit
-        if (null !== $projectedItem) {
-            $loggerCalls[] = [
-                'Item hit! Returning data from the cache',
-                [
-                    self::CACHE_KEY => $item->getKey(),
-                    self::DATA      => $expectedProviderData,
-                ],
-            ];
-        }
-
         // Cache miss
-        if (null === $projectedItem) {
-            $loggerCalls[] = [
-                'Item not hit! Fetching data...',
-                [self::CACHE_KEY => $item->getKey()],
-            ];
-
-            if (is_iterable($expectedProviderData)) {
-                // Get data from provider
-                $repository
-                    ->expects($this->once())
-                    ->method('add')
-                    ->with((clone $item)->storeData($expectedProviderData));
-
-                $loggerCalls[] = [
-                    'Item saved into cache and returned',
-                    [self::CACHE_KEY => $item->getKey(), self::DATA => $expectedProviderData],
-                ];
-            } else {
-                // No data found on the provider
-                $loggerCalls[] = [
-                    'No data fetched and stored into cache!',
-                    [self::CACHE_KEY => $item->getKey()],
-                ];
-            }
+        if (null === $projectedItem && is_iterable($providerData)) {
+            // Get data from provider
+            $repository
+                ->expects($this->once())
+                ->method('add')
+                ->with((clone $item)->storeData($providerData));
         }
-
-        $this->getLogger()
-            ->expects($this->exactly(count($loggerCalls)))
-            ->method('info')
-            ->withConsecutive(...$loggerCalls);
 
         $result = call_user_func_array([$this->getProvider($originalProvider), $method], $args);
 
-        $this->assertEquals($expectedProviderData, $result);
+        $this->assertEquals($providerData, $result);
     }
 
     public function getAndCacheDataDataProvider(): array
