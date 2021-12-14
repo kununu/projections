@@ -22,6 +22,12 @@ final class AbstractCachedProviderTest extends CachedProviderTestCase
             'age'  => 22,
         ];
 
+        $dataCached = [
+            'id'   => 2,
+            'name' => 'The Name of 2 cached',
+            'age'  => 22,
+        ];
+
         $originalProvider = new MyProviderStub();
 
         return [
@@ -46,8 +52,8 @@ final class AbstractCachedProviderTest extends CachedProviderTestCase
                 self::METHOD_GET_DATA,
                 [2],
                 new MyStubProjectionItem(2),
-                (new MyStubProjectionItem(2))->storeData($data),
-                $data,
+                (new MyStubProjectionItem(2))->storeData($dataCached),
+                $dataCached,
             ],
         ];
     }
