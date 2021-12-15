@@ -14,7 +14,7 @@
     "symfony/browser-kit": "^4.4",
     "symfony/cache": "^4.4",
     "jms/serializer-bundle": "^2.0",
-    "kununu/testing-bundle": "^13.0",
+    "kununu/testing-bundle": "^14.0",
     "kununu/scripts": "*"
   },
   "suggest": {
