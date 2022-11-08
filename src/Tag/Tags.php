@@ -1,11 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kununu\Projections\Tag;
 
 final class Tags
 {
     private $tags = [];
-    private $tagsAsStrings = [];
 
     public function __construct(Tag ...$tags)
     {
@@ -16,18 +16,17 @@ final class Tags
 
     public function raw(): array
     {
-        return array_keys($this->tagsAsStrings);
+        return array_keys($this->tags);
     }
 
     private function add(Tag $tag): void
     {
         $value = $tag->value();
 
-        if (isset($this->tagsAsStrings[$value])) {
+        if (isset($this->tags[$value])) {
             return;
         }
 
-        $this->tags[] = $tag;
-        $this->tagsAsStrings[$value] = true;
+        $this->tags[$value] = true;
     }
 }

@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kununu\Projections\Tests\Functional\App\Repository;
 
-use Kununu\Projections\ProjectionItem;
+use Kununu\Projections\ProjectionItemInterface;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
 
-class ProjectionItemStub implements ProjectionItem
+final class ProjectionItemStub implements ProjectionItemInterface
 {
     private $id;
 

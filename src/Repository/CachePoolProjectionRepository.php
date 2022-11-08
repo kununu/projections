@@ -1,16 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kununu\Projections\Repository;
 
-use Kununu\Projections\Exception\ProjectionException;
-use Kununu\Projections\ProjectionItem;
-use Kununu\Projections\ProjectionRepository;
-use Kununu\Projections\Tag\Tags;
 use JMS\Serializer\SerializerInterface;
+use Kununu\Projections\Exception\ProjectionException;
+use Kununu\Projections\ProjectionItemInterface;
+use Kununu\Projections\ProjectionRepositoryInterface;
+use Kununu\Projections\Tag\Tags;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 
-final class CachePoolProjectionRepository implements ProjectionRepository
+final class CachePoolProjectionRepository implements ProjectionRepositoryInterface
 {
     private const JMS_SERIALIZER_FORMAT = 'json';
 
@@ -19,11 +20,11 @@ final class CachePoolProjectionRepository implements ProjectionRepository
 
     public function __construct(TagAwareAdapterInterface $cachePool, SerializerInterface $serializer)
     {
-        $this->cachePool  = $cachePool;
+        $this->cachePool = $cachePool;
         $this->serializer = $serializer;
     }
 
-    public function add(ProjectionItem $item): void
+    public function add(ProjectionItemInterface $item): void
     {
         $cacheItem = $this->createCacheItem($item);
 
@@ -32,7 +33,7 @@ final class CachePoolProjectionRepository implements ProjectionRepository
         }
     }
 
-    public function addDeferred(ProjectionItem $item): void
+    public function addDeferred(ProjectionItemInterface $item): void
     {
         $cacheItem = $this->createCacheItem($item);
 
@@ -48,7 +49,7 @@ final class CachePoolProjectionRepository implements ProjectionRepository
         }
     }
 
-    public function get(ProjectionItem $item): ?ProjectionItem
+    public function get(ProjectionItemInterface $item): ?ProjectionItemInterface
     {
         $cacheItem = $this->cachePool->getItem($item->getKey());
 
@@ -59,7 +60,7 @@ final class CachePoolProjectionRepository implements ProjectionRepository
         return $this->serializer->deserialize($cacheItem->get(), get_class($item), self::JMS_SERIALIZER_FORMAT);
     }
 
-    public function delete(ProjectionItem $item): void
+    public function delete(ProjectionItemInterface $item): void
     {
         if (!$this->cachePool->deleteItem($item->getKey())) {
             throw new ProjectionException('Not possible to delete projection item on cache pool');
@@ -73,7 +74,7 @@ final class CachePoolProjectionRepository implements ProjectionRepository
         }
     }
 
-    private function createCacheItem(ProjectionItem $item): CacheItemInterface
+    private function createCacheItem(ProjectionItemInterface $item): CacheItemInterface
     {
         $cacheItem = $this->cachePool->getItem($item->getKey());
         $cacheItem->set($this->serializer->serialize($item, self::JMS_SERIALIZER_FORMAT));

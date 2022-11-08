@@ -31,7 +31,7 @@ final class AbstractCachedProviderTest extends CachedProviderTestCase
         $originalProvider = new MyProviderStub();
 
         return [
-            'cache_miss_and_data_from_external_provider'    => [
+            'cache_miss_and_data_from_external_provider'              => [
                 $originalProvider,
                 self::METHOD_GET_DATA,
                 [2],
@@ -39,7 +39,15 @@ final class AbstractCachedProviderTest extends CachedProviderTestCase
                 null,
                 $data,
             ],
-            'cache_miss_and_no_data_from_external_provider' => [
+            'cache_miss_and_data_from_external_provider_not_relevant' => [
+                $originalProvider,
+                self::METHOD_GET_DATA,
+                [3],
+                new MyStubProjectionItem(3),
+                null,
+                null,
+            ],
+            'cache_miss_and_no_data_from_external_provider'           => [
                 $originalProvider,
                 self::METHOD_GET_DATA,
                 [1],
@@ -47,7 +55,7 @@ final class AbstractCachedProviderTest extends CachedProviderTestCase
                 null,
                 null,
             ],
-            'cache_hit'                                     => [
+            'cache_hit'                                               => [
                 $originalProvider,
                 self::METHOD_GET_DATA,
                 [2],
@@ -58,6 +66,31 @@ final class AbstractCachedProviderTest extends CachedProviderTestCase
         ];
     }
 
+    public function testInvalidateCacheItemByKey(): void
+    {
+        $provider = $this->getProvider(new MyProviderStub());
+
+        $this->getLogger()
+            ->expects($this->once())
+            ->method('info')
+            ->with(
+                'Deleting cache item',
+                ['cache_key' => 'my_data_1']
+            );
+
+        $this->getProjectionRepository()
+            ->expects($this->once())
+            ->method('delete')
+            ->with(new MyStubProjectionItem(1));
+
+        $provider->invalidateItem(1);
+    }
+
+    /**
+     * @param $originalProvider
+     *
+     * @return MyCachedProviderStub|AbstractCachedProvider
+     */
     protected function getProvider($originalProvider): AbstractCachedProvider
     {
         return new MyCachedProviderStub($originalProvider, $this->getProjectionRepository(), $this->getLogger());

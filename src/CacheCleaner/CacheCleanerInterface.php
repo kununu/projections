@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kununu\Projections\CacheCleaner;
 
-interface CacheCleaner
+interface CacheCleanerInterface
 {
     public function clear(): void;
 }

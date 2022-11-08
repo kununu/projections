@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-require dirname(__DIR__).'/../../vendor/autoload.php';
+require dirname(__DIR__) . '/../../vendor/autoload.php';
 
 $_SERVER += $_ENV;
 $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = ($_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? null) ?: 'dev';

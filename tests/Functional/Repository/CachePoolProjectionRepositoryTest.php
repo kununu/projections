@@ -8,6 +8,7 @@ use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
 use Kununu\Projections\Tests\Functional\App\Repository\ProjectionItemStub;
 use Kununu\TestingBundle\Test\FixturesAwareTestCase;
+use Kununu\TestingBundle\Test\Options\Options;
 
 final class CachePoolProjectionRepositoryTest extends FixturesAwareTestCase
 {
@@ -97,9 +98,7 @@ final class CachePoolProjectionRepositoryTest extends FixturesAwareTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->loadCachePoolFixtures('app.cache.projections', []);
+        $this->loadCachePoolFixtures('app.cache.projections', Options::create());
 
         $this->projectionRepository = $this->getFixturesContainer()->get(CachePoolProjectionRepository::class);
 

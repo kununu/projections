@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kununu\Projections\Tests\Unit\CacheCleaner;
 
-use Kununu\Projections\CacheCleaner\CacheCleaner;
 use Kununu\Projections\CacheCleaner\CacheCleanerChain;
+use Kununu\Projections\CacheCleaner\CacheCleanerInterface;
 use PHPUnit\Framework\TestCase;
 
 final class CacheCleanerChainTest extends TestCase
@@ -20,9 +20,9 @@ final class CacheCleanerChainTest extends TestCase
         $chain->clear();
     }
 
-    private function createCacheCleaner(): CacheCleaner
+    private function createCacheCleaner(): CacheCleanerInterface
     {
-        $cleaner = $this->createMock(CacheCleaner::class);
+        $cleaner = $this->createMock(CacheCleanerInterface::class);
 
         $cleaner
             ->expects($this->once())

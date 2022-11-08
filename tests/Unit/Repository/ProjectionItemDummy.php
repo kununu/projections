@@ -1,18 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kununu\Projections\Tests\Unit\Repository;
 
-use Kununu\Projections\ProjectionItem;
+use Kununu\Projections\ProjectionItemInterface;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
 
-final class ProjectionItemDummy implements ProjectionItem
+final class ProjectionItemDummy implements ProjectionItemInterface
 {
     private const PROJECTION_KEY = 'test_%s';
 
-    protected $id;
-
-    protected $stuff;
+    private $id;
+    private $stuff;
 
     public function __construct($id)
     {
@@ -29,7 +29,7 @@ final class ProjectionItemDummy implements ProjectionItem
         return $this->stuff;
     }
 
-    public function setStuff(string $stuff): ProjectionItem
+    public function setStuff(string $stuff): ProjectionItemInterface
     {
         $this->stuff = $stuff;
 

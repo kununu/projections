@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Kununu\Projections\CacheCleaner;
 
-use Kununu\Projections\ProjectionRepository;
+use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Tag\Tags;
 use Psr\Log\LoggerInterface;
 
-abstract class AbstractCacheCleanerByTags implements CacheCleaner
+abstract class AbstractCacheCleanerByTags implements CacheCleanerInterface
 {
     private $projectionRepository;
     private $logger;
 
-    public function __construct(ProjectionRepository $projectionRepository, LoggerInterface $logger)
+    public function __construct(ProjectionRepositoryInterface $projectionRepository, LoggerInterface $logger)
     {
         $this->projectionRepository = $projectionRepository;
         $this->logger = $logger;

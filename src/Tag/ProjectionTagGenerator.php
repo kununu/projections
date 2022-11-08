@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kununu\Projections\Tag;
 
 trait ProjectionTagGenerator
 {
-    private static function createTagsFromArray(string ...$tagsAsStrings): Tags
+    private static function createTagsFromArray(string ...$tags): Tags
     {
-        $tags = [];
-
-        foreach ($tagsAsStrings as $tag) {
-            $tags[] = new Tag($tag);
-        }
-
-        return new Tags(...$tags);
+        return new Tags(
+            ...array_map(
+                function(string $tag): Tag {
+                    return new Tag($tag);
+                },
+                $tags
+            )
+        );
     }
 }

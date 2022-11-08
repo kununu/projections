@@ -1,8 +1,8 @@
 # Kununu Projections
 
-Projections are a temporary storage and are a way to access data faster than fetching it from a regular storage.
+Projections are a temporary storage and are a way to access data faster than fetching it from a regular storage (e.g. getting data from a cache vs from the database).
 
-Data needs to be projected first, so then it's projection can be accessed, without the need to access the actual source of truth, which is usually a slower process.
+Data needs to be projected first so that its projection can be accessed without the need to access the actual source of truth, which is usually a slower process.
 
 Projections have a short lifetime, and are not updated automatically if data in source of truth changes. So they need to be frequently refreshed.
 
@@ -17,14 +17,15 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
 ### Add custom private repositories to composer.json
 
 ```json
-"repositories": [
-  ...
-  {
-    "type": "vcs",
-    "url": "https://github.com/kununu/projections.git",
-    "no-api": true
-  }
-]
+{
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/kununu/projections.git",
+      "no-api": true
+    }
+  ]
+}
 ```
 
 ### Require this library to your project
@@ -48,23 +49,37 @@ composer require jms/serializer-bundle
 
 ## Usage
 
-### `ProjectionItem`
+### `ProjectionItemInterface`
  
-A projection is represented by an object that implements `ProjectionItem` interface. This object is called **projection item** and holds on its properties the data to be projected.
+A projection is represented by an object that implements `ProjectionItemInterface` interface. This object is called **projection item** and holds on its properties the data to be projected.
+
+```php
+interface ProjectionItemInterface
+{
+    public function getKey(): string;
+
+    public function getTags(): Tags;
+}
+```
 
 Here's an example of projection item:
 
 ```php
 namespace Kununu\Example;
 
-class ExampleProjectionItem implements ProjectionItem
+use Kununu\Projections\ProjectionItemInterface;
+use Kununu\Projections\Tag\ProjectionTagGenerator;
+
+class ExampleProjectionItem implements ProjectionItemInterface
 {
+    use ProjectionTagGenerator;
+
     private $id;
     private $someValue;
 
     public function __construct(string $id, string $someValue)
     {
-        $this->id        = $id;
+        $this->id = $id;
         $this->someValue = $someValue;
     }
 
@@ -75,62 +90,66 @@ class ExampleProjectionItem implements ProjectionItem
 
     public function getTags(): Tags
     {
-        return new Tags(new Tag('example_tag'), new Tag($this->id));
+        // This is in ProjectionTagGenerator trait
+        return ProjectionTagGenerator::createTagsFromArray('example_tag', $this->id);
+        // It is functional equivalent to:
+        //
+        // return new Tags(new Tag('example_tag'), new Tag($this->id));
     }
 }
 ```
 
-The `getKey()` and `getTags()` methods must be implemented.
- 
-The `getKey()` method is the unique identifier of the projection. If projections are stored with the same key then they will be overridden.
- 
-The `getTags()` method serves to mark the projection item with a tag. These can be used later for bulk operations on projections, like delete all projections with a certain tag.
-    
-### `ProjectionItemIterable`
+The following methods must be implemented:
 
-The package also offers an extension of `ProjectionItem` designed to store generic data (the data itself will be any PHP iterable, like an array).
+* `getKey()` returns the unique identifier of the projection. If projections are stored with the same key then they will be overridden.
+ 
+* `getTags()` returns the tags marked on the projection item. These can be used later for bulk operations on projections, like delete all projections with a certain tag.
 
-The interface is `ProjectionItemIterable` and must implement the following methods:
+### `ProjectionItemIterableInterface`
+
+The package also offers an extension of `ProjectionItemInterface` designed to store generic data (the data itself will be any PHP iterable, like an array).
+
+The interface is `ProjectionItemIterableInterface` and must implement the following methods:
 
 ```php
- interface ProjectionItemIterable extends ProjectionItem
- {
-     public function storeData(iterable $data): ProjectionItemArrayData;
+interface ProjectionItemIterableInterface extends ProjectionItemInterface
+{
+    public function storeData(iterable $data): ProjectionItemIterableInterface;
 
-     public function data(): iterable;
- }
+    public function data(): iterable;
+}
 ```
 
-A trait called `ProjectionItemIterableTrait` is provided with those methods already implemented and with the data stored as an array, so just use it your projection item classes and you're good to go.
+A trait called `ProjectionItemIterableTrait` is provided with those methods already implemented and with the data stored as an array, so just use it your projection item classes, and you're good to go.
 
-Just bear in mind that the trait is only implementing the methods defined in `ProjectionItemIterable` and not those of `ProjectionItem` so it is still responsibility of your projection item class to implement them!
+Just bear in mind that the trait is only implementing the methods defined in `ProjectionItemIterableInterface` and not those of `ProjectionItemInterface` so it is still responsibility of your projection item class to implement them!
 
-### `ProjectionRepository`
+### `ProjectionRepositoryInterface`
 
-The **projection item** is projected through a repository which implements `ProjectionRepository` interface.
+The **projection item** is projected through a repository which implements `ProjectionRepositoryInterface` interface.
 
 This holds methods to get, add and delete the projections. The methods are used by passing a **projection item** object.
 
- ```php
- interface ProjectionRepository
- {
-     public function add(ProjectionItem $item): void;
+```php
+interface ProjectionRepositoryInterface
+{
+    public function add(ProjectionItemInterface $item): void;
 
-     public function addDeferred(ProjectionItem $item): void;
+    public function addDeferred(ProjectionItemInterface $item): void;
 
-     public function flush(): void;
+    public function flush(): void;
 
-     public function get(ProjectionItem $item): ?ProjectionItem;
+    public function get(ProjectionItemInterface $item): ?ProjectionItemInterface;
 
-     public function delete(ProjectionItem $item): void;
+    public function delete(ProjectionItemInterface $item): void;
 
-     public function deleteByTags(Tags $tags): void;
- }
- ```
+    public function deleteByTags(Tags $tags): void;
+}
+```
 
  * `add()` method immediately projects the item.
  * `addDeferred()` method sets items to be projected, but they are only projected when `flush()` is called.
- * `get()` method gets a projected item. If it not projected, then `null` is returned.
+ * `get()` method gets a projected item. If it is not projected, then `null` is returned.
  * `delete()` method deletes item from projection
  * `deleteByTags()` method deletes all projected items that have at least one of the tags passed as argument
 
@@ -145,11 +164,7 @@ This repository is called `CachePoolProjectionRepository`.
 Besides the Symfony's Tag Aware Cache Pool interface, this repository uses the JMS Serializer. The following snippet is the repository's constructor:
 
 ```php
-    public function __construct(TagAwareAdapterInterface $cachePool, SerializerInterface $serializer)
-    {
-        $this->cachePool  = $cachePool;
-        $this->serializer = $serializer;
-    }
+public function __construct(TagAwareAdapterInterface $cachePool, SerializerInterface $serializer);
 ```
     
 So there is the need to define the serialization config for the Projection items. For instance, for the previous `ExampleProjectionItem` example, here is an example of the JMS Serializer XML config for this class:
@@ -161,7 +176,7 @@ So there is the need to define the serialization config for the Projection items
     <property name="id" type="string"></property>
     <property name="someValue" type="string"></property>
   </class>
- </serializer>
+</serializer>
 ```
 
 This should be saved in a `ExampleProjectionItem.xml` file.
@@ -176,14 +191,13 @@ Create a cache pool with Symfony config. Here's an example for the cache pool to
 
 ```yaml
 framework:
-    cache:
-        prefix_seed: "example"
-        default_memcached_provider: "memcached://172.0.0.1:1121"
-        pools:
-            example.cache.projections:
-                adapter: cache.adapter.memcached
-                default_lifetime: 3600
-    
+  cache:
+    prefix_seed: "example"
+    default_memcached_provider: "memcached://172.0.0.1:1121"
+    pools:
+      example.cache.projections:
+        adapter: cache.adapter.memcached
+        default_lifetime: 3600
 ```
 
 This automatically creates a `example.cache.projections` service. In this case the lifetime for the projections is 3600 seconds = 1 hour.
@@ -192,34 +206,37 @@ Here is assumed that the `jms/serializer-bundle` was required. The minimum confi
 
 ```yaml
 jms_serializer:
-    metadata:
-        directories:
-            projections:
-                namespace_prefix: "Kununu\Example"
-                path: "%kernel.root_dir%/Repository/Resources/config/serializer"
+  metadata:
+    directories:
+      projections:
+        namespace_prefix: "Kununu\Example"
+        path: "%kernel.root_dir%/Repository/Resources/config/serializer"
 ```
     
 where `%kernel.root_dir%/Repository/Resources/config/serializer` is the directory where is the JMS Serializer configuration files for the projection items, which means the previous `ExampleProjectionItem.xml` file is inside.
     
 Please notice that the namespace prefix of the projection item class is also defined in here.
     
-Next define the `CachePoolProjectionRepository` as a Symfony service:
+Next define your custom instance of `CachePoolProjectionRepository` as a Symfony service:
 
 ```yaml
 services:
-    _defaults:
-        autowire: true
-        autoconfigure: true
+  _defaults:
+    autowire: true
+    autoconfigure: true
 
-    Kununu/Projections/Repository/CachePoolProjectionRepository:
-        class: Kununu\Projections\Repository\CachePoolProjectionRepository
-        arguments:
-            - '@example.cache.projections'
-            - '@jms_serializer'
+  #  A tag-aware cache adapter
+  example.cache.projections.tagged:
+    class: Symfony\Component\Cache\Adapter\TagAwareAdapter
+    decorates: 'example.cache.projections'
 
-    example.cache.projections.tagged:
-        class: Symfony\Component\Cache\Adapter\TagAwareAdapter
-        decorates: 'example.cache.projections'
+  # My cached repository
+  app.my.cached.repository:
+    class: Kununu\Projections\Repository\CachePoolProjectionRepository
+    arguments:
+      - '@example.cache.projections'
+      - '@jms_serializer'
+
 ```
 
 Note that the `TagAwareAdapter` is added as a decorator for the cache pool service.
@@ -228,35 +245,62 @@ Now you can inject the repository's service. Example:
 
 ```yaml
 App\Infrastructure\UseCase\Query\GetProfileCommonByUuid\DataProvider\ProjectionDataProvider:
-    arguments:
-        - '@Kununu/Projections/Repository/CachePoolProjectionRepository'
+  arguments:
+    - '@app.my.cached.repository'
 ```
     
-And inside the respective class we should depend only on the `ProjectionRepository` interface.
+And inside the respective class we should depend only on the `ProjectionRepositoryInterface` interface instance to project/get/delete data from the cache.
 
 ```php
+use Kununu\Projections\ProjectionRepositoryInterface;
+use Kununu\Projections\Tag\Tag;
+use Kununu\Projections\Tag\Tags;
+
 class ProjectionDataProvider
 {
     private $projectionRepository;
 
-    public function __construct(ProjectionRepository $projectionRepository)
+    public function __construct(ProjectionRepositoryInterface $projectionRepository)
     {
         $this->projectionRepository = $projectionRepository;
     }
 
-    ...
+	public function someAction(): void
+	{
+		// We can use the projection repository to fetch/store data in the cache
+		$item = new MyProjectionItemClass('the key for this item');
+		$value = $this->projectionRepository->get($item);
+		
+		// Cache miss
+		if (null === $value) {
+		    // Is up to you to define what data to store on the item
+            $item->setProperty1('value');
+            $item->setProperty2(2040);
+            
+            $this->projectionRepository->add($item);
+	    } else {
+	        // Cache hit
+	        // Use item fetched from the cache
+	        var_export($item->getProperty1());
+	    }
+	}
+	
+	public function removeItems(): void
+	{
+	    // Remove all items in the cache that are tagged with 'a-tag'...
+	    $this->projectionRepository->deleteByTags(new Tags(new Tag('a-tag')));
+	}
 }
 ```
     
 Now we can start reading, setting and deleting from the cache pool :)
 
+### `CacheCleanerInterface`
 
-### `CacheCleaner`
-
-Sometimes we need to force the cleaning of caches. In order to do this the library offers an interface called `CacheCleaner`:
+Sometimes we need to force the cleaning of caches. In order to do this the library offers an interface called `CacheCleanerInterface`:
 
 ```php
-interface CacheCleaner
+interface CacheCleanerInterface
 {
     public function clear(): void;
 }
@@ -266,18 +310,17 @@ It only has one method called `clear` which should as the name says clear the da
 
 #### AbstractCacheCleanerByTags
 
-The interface `CacheCleaner` by itself is not really useful. One of the most common cases when cleaning/invalidating caches is to delete a series of data.
+The interface `CacheCleanerInterface` by itself is not really useful. One of the most common cases when cleaning/invalidating caches is to delete a series of data.
 
 The `AbstractCacheCleanerByTags` provides a base class that will allow you to invalidate cache items by **Tags**.
 
-As we already have seen, the `ProjectionRepository` already has a method called `deleteByTags`, so this class will combine that usage and abstract it.
+As we already have seen, the `ProjectionRepositoryInterface` already has a method called `deleteByTags`, so this class will combine that usage and abstract it.
 
-So your cache cleaner class by tags should be instantiated with a `ProjectionRepository` instance (and also with a PSR logger instance), and simply implement the `getTags` method which must return the `Tags` collection that will be passed to the `deleteByTags` on the repository instance.
+So your cache cleaner class by tags should be instantiated with a `ProjectionRepositoryInterface` instance (and also with a PSR logger instance), and simply implement the `getTags` method which must return the `Tags` collection that will be passed to the `deleteByTags` on the repository instance.
 
 
 ```php
 public function __construct(ProjectionRepository $projectionRepository, LoggerInterface $logger);
-
 
 abstract protected function getTags(): Tags;
 ```
@@ -285,8 +328,7 @@ abstract protected function getTags(): Tags;
 Example:
 
 ```php
-
-use Kununu\Projections\CacheCleaner\CacheCleaner;
+use Kununu\Projections\CacheCleaner\CacheCleanerInterface;
 use Kununu\Projections\CacheCleaner\AbstractCacheCleanerByTags;
 
 class MyCacheCleaner extends AbstractCacheCleanerByTags
@@ -304,7 +346,7 @@ class MyClass
 {
     private $cacheCleaner;
 
-    public function __construct(CacheCleaner $cacheCleaner)
+    public function __construct(CacheCleanerInterface $cacheCleaner)
     {
         $this->cacheCleaner = $cacheCleaner;
     }
@@ -322,7 +364,6 @@ $myClass = new MyClass($cacheCleaner);
 // When I call `myMethod` it will call `MyCacheCleaner` and delete all cache entries that
 // are tagged with 'my-tag1' and 'my-tag2'
 $myClass->myMethod();
-
 ```
 
 ##### AbstractCacheCleanerTestCase
@@ -370,9 +411,8 @@ Example:
 
 ```php
 
-use Kununu\Projections\CacheCleaner\CacheCleaner;
+use Kununu\Projections\CacheCleaner\CacheCleanerInterface;
 use Kununu\Projections\CacheCleaner\AbstractCacheCleanerByTags;
-
 
 // Continuing our example, let's add more cache cleaners...
 
@@ -385,7 +425,7 @@ class MySecondCacheCleaner extends AbstractCacheCleanerByTags
 };
 
 
-class MyThirdCacheCleaner implements CacheCleaner
+class MyThirdCacheCleaner implements CacheCleanerInterface
 {
     public function clear(): void
     {
@@ -426,20 +466,27 @@ Usually the flow is always the same.
     - Return the data
 - Rinse and repeat...
 
-So the `AbstractCachedProvider` will help you in reducing the boiler plate for those scenarios.
+So the `AbstractCachedProvider` will help you in reducing the boilerplate for those scenarios.
 
 Your "provider" class should extend it and for each method where you need to use the flow described above you just need to call the `getAndCacheData` method:
 
 ```php
-protected function getAndCacheData(ProjectionItemIterable $item, callable $dataGetter): ?iterable;
+protected function getAndCacheData(
+    ProjectionItemIterableInterface $item,
+    callable $dataGetter,
+    callable ...$preProjections
+): ?iterable;
 ```
 
 - The `$item` parameter is a projection item that will be used to build the cache key
 - The `$dataGetter` is your custom function that should return an `iterable` with you data or null if no data was found
+- The `$preProjections` are your custom functions that should manipulate the item/data before they are projected. If you want to *not store* it then return null
 
 An example:
 
 ```php
+use Kununu\Projections\ProjectionRepositoryInterface;
+
 interface MyProviderInterface
 {
     public function getCustomerData(int $customerId): ?iterable;
@@ -456,11 +503,14 @@ class MyProvider implements MyProviderInterface
     }
 }
 
+/**
+ * This class will decorate any MyProviderInterface instance (e.g. MyProvider) to use projections and read/write from cache
+ */
 class MyCachedProvider extends AbstractCachedProvider implements MyProviderInterface
 {
     private $myProvider;
     
-    public function __construct(MyProviderInterface $myProvider, ProjectionRepository $projectionRepository, LoggerInterface $logger)
+    public function __construct(MyProviderInterface $myProvider, ProjectionRepositoryInterface $projectionRepository, LoggerInterface $logger)
     {
         parent::__construct($projectionRepository, $logger);
         $this->myProvider = $myProvider;
@@ -470,8 +520,24 @@ class MyCachedProvider extends AbstractCachedProvider implements MyProviderInter
     {
         return $this->getAndCacheData(
             new CustomerByIdProjectionItem($customerId),
+            // This callable will get the data when there is a cache miss (e.g. data was not found on the cache)
             function() use ($customerId): ?iterable {
                 return $this->myProvider->getCustomerData($customerId);
+            },
+            // Additional callables to do pre-processing before projecting the items to the cache. They are optional
+            // and only called in the event of a cache miss (and after the data getter callable returns the data)
+            function(ProjectionItemIterableInterface $item, iterable $data): ?ProjectionItemIterableInterface {
+                // A case where I don't want to store the projection because it does not have relevant information 
+                if($data['customer_id'] > 200) {
+                    return null;
+                }
+                
+                // We could also add more info here...
+				// E.g.: we fetch some data from database but we need to call some external API to get additional data
+				// This is a perfect place to do that
+                $item->setValue(500);
+
+                return $item;
             }
         );        
     }
@@ -492,7 +558,7 @@ In order to help you unit testing your cached providers implementations the `Cac
 
 Just make you test class extend it and override the `METHODS` constant and implement the `getProvider` method.
 
-The `getProvider` is were you should create the "decorated" cached provider you want to test. E.g:
+The `getProvider` is where you should create the "decorated" cached provider you want to test. E.g:
 
 ```php
 protected function getProvider($originalProvider): AbstractCachedProvider
@@ -510,10 +576,9 @@ The `METHODS` constant should contain the methods of your provider class.
 For our example above to test the `getCustomerData` method:
 
 ```php
-    protected const METHODS = [
-        'getCustomerData',
-    ];
-
+protected const METHODS = [
+    'getCustomerData',
+];
 ```
 
 Now, for each method defined in the `METHODS` constant you need to create a PHPUnit data provider method.

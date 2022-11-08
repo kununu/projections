@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kununu\Projections\Tests\Unit\Repository;
 
@@ -11,7 +12,7 @@ final class CacheItemStub implements CacheItemInterface
     private $isHit = false;
     private $tags = [];
 
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
@@ -21,12 +22,12 @@ final class CacheItemStub implements CacheItemInterface
         return $this->value;
     }
 
-    public function isHit()
+    public function isHit(): bool
     {
         return $this->isHit;
     }
 
-    public function set($value)
+    public function set($value): CacheItemStub
     {
         $this->value = $value;
 
@@ -64,7 +65,7 @@ final class CacheItemStub implements CacheItemInterface
         return $this;
     }
 
-    public function getTags() : array
+    public function getTags(): array
     {
         return $this->tags;
     }
