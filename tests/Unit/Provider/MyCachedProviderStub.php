@@ -28,12 +28,12 @@ final class MyCachedProviderStub extends AbstractCachedProvider implements MyPro
             function() use ($id): ?iterable {
                 return $this->provider->getData($id);
             },
-            function(ProjectionItemIterableInterface $item): ?ProjectionItemIterableInterface {
+            function(ProjectionItemIterableInterface $item, iterable $data): ?iterable {
                 assert($item instanceof MyStubProjectionItem);
 
                 return $item->getKey() === 'my_data_3'
                     ? null
-                    : $item;
+                    : $data;
             }
         );
     }

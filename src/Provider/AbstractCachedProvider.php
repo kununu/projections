@@ -43,31 +43,35 @@ abstract class AbstractCachedProvider
 
         $this->logger->info('Item not hit! Fetching data...', [self::CACHE_KEY => $item->getKey()]);
 
-        if (is_iterable($data = $dataGetter())) {
+        $data = $dataGetter();
+
+        if (is_iterable($data)) {
             // Manipulate data before projection if callers are defined
             foreach ($preProjections as $preProjection) {
-                $item = $preProjection($item, $data);
+                $data = $preProjection($item, $data);
                 // If pre-projection callable returns null means we do not have relevant information.
-                // We will not store the item in the cache and will exit right away returning null
-                if (null === $item) {
+                // We will not store the item in the cache and will break the pre-projection chain
+                if (null === $data) {
                     $this->logger->info('Item not stored in the cache!', [self::DATA => $data]);
+                    $data = null;
 
-                    return null;
+                    break;
                 }
             }
 
-            $this->projectionRepository->add($item->storeData($data));
-            $this->logger->info(
-                'Item saved into cache and returned',
-                [self::CACHE_KEY => $item->getKey(), self::DATA => $data]
-            );
-
-            return $data;
+            if (null !== $data) {
+                $this->projectionRepository->add($item->storeData($data));
+                $this->logger->info(
+                    'Item saved into cache and returned',
+                    [self::CACHE_KEY => $item->getKey(), self::DATA => $data]
+                );
+            }
+        } else {
+            $this->logger->info('No data fetched and stored into cache!', [self::CACHE_KEY => $item->getKey()]);
+            $data = null;
         }
 
-        $this->logger->info('No data fetched and stored into cache!', [self::CACHE_KEY => $item->getKey()]);
-
-        return null;
+        return $data;
     }
 
     protected function invalidateCacheItemByKey(ProjectionItemIterableInterface $projectionItem): self

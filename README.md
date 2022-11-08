@@ -70,7 +70,7 @@ namespace Kununu\Example;
 use Kununu\Projections\ProjectionItemInterface;
 use Kununu\Projections\Tag\ProjectionTagGenerator;
 
-class ExampleProjectionItem implements ProjectionItemInterface
+final class ExampleProjectionItem implements ProjectionItemInterface
 {
     use ProjectionTagGenerator;
 
@@ -173,8 +173,8 @@ So there is the need to define the serialization config for the Projection items
 <?xml version="1.0" encoding="UTF-8" ?>
 <serializer>
   <class name="Kununu\Example\ExampleProjectionItem">
-    <property name="id" type="string"></property>
-    <property name="someValue" type="string"></property>
+    <property name="id" type="string"/>
+    <property name="someValue" type="string"/>
   </class>
 </serializer>
 ```
@@ -256,7 +256,7 @@ use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
 
-class ProjectionDataProvider
+final class ProjectionDataProvider
 {
     private $projectionRepository;
 
@@ -331,7 +331,7 @@ Example:
 use Kununu\Projections\CacheCleaner\CacheCleanerInterface;
 use Kununu\Projections\CacheCleaner\AbstractCacheCleanerByTags;
 
-class MyCacheCleaner extends AbstractCacheCleanerByTags
+final class MyCacheCleaner extends AbstractCacheCleanerByTags
 {
     protected function getTags(): Tags
     {
@@ -342,7 +342,7 @@ class MyCacheCleaner extends AbstractCacheCleanerByTags
     }
 };
 
-class MyClass
+final class MyClass
 {
     private $cacheCleaner;
 
@@ -392,7 +392,7 @@ The `TAGS` constant must be the tags that you expect that your cache cleaner cla
 For the example above we are expecting that `MyCacheCleaner::getTags` will return a `Tags` collection with the same tags defined in the constant, e.g.:
 
 ```php
-class MyCacheCleaner extends AbstractCacheCleanerByTags
+final class MyCacheCleaner extends AbstractCacheCleanerByTags
 {
     protected function getTags(): Tags
     {
@@ -416,7 +416,7 @@ use Kununu\Projections\CacheCleaner\AbstractCacheCleanerByTags;
 
 // Continuing our example, let's add more cache cleaners...
 
-class MySecondCacheCleaner extends AbstractCacheCleanerByTags
+final class MySecondCacheCleaner extends AbstractCacheCleanerByTags
 {
     protected function getTags(): Tags
     {
@@ -424,8 +424,7 @@ class MySecondCacheCleaner extends AbstractCacheCleanerByTags
     }
 };
 
-
-class MyThirdCacheCleaner implements CacheCleanerInterface
+final class MyThirdCacheCleaner implements CacheCleanerInterface
 {
     public function clear(): void
     {
@@ -480,19 +479,27 @@ protected function getAndCacheData(
 
 - The `$item` parameter is a projection item that will be used to build the cache key
 - The `$dataGetter` is your custom function that should return an `iterable` with you data or null if no data was found
-- The `$preProjections` are your custom functions that should manipulate the item/data before they are projected. If you want to *not store* it then return null
+  - Signature of the callable function:
+    - `function(): ?iterable`
+- The `$preProjections` are your custom functions that should manipulate the item/data before they are projected:
+  - Signature of the callable functions:
+      - `function(ProjectionItemIterableInterface $item, iterable $data): ?iterable`
+  - The callable should return the `$data` that will be stored on the `ProjectionItemIterableInterface` instance via `storeData` method, so **do not call that method directly** in your callable!
+  - The data will be propagated for each callable passed 
+  - If you want to *not store* data on the cache, then your callable should return `null` and the pre-processor chain will end 
 
 An example:
 
 ```php
 use Kununu\Projections\ProjectionRepositoryInterface;
+use Kununu\Projections\ProjectionItemIterableInterface;
 
 interface MyProviderInterface
 {
     public function getCustomerData(int $customerId): ?iterable;
 }
 
-class MyProvider implements MyProviderInterface
+final class MyProvider implements MyProviderInterface
 {
     public function getCustomerData(int $customerId): ?iterable
     {
@@ -506,12 +513,15 @@ class MyProvider implements MyProviderInterface
 /**
  * This class will decorate any MyProviderInterface instance (e.g. MyProvider) to use projections and read/write from cache
  */
-class MyCachedProvider extends AbstractCachedProvider implements MyProviderInterface
+final class MyCachedProvider extends AbstractCachedProvider implements MyProviderInterface
 {
     private $myProvider;
     
-    public function __construct(MyProviderInterface $myProvider, ProjectionRepositoryInterface $projectionRepository, LoggerInterface $logger)
-    {
+    public function __construct(
+        MyProviderInterface $myProvider,
+        ProjectionRepositoryInterface $projectionRepository,
+        LoggerInterface $logger
+    ) {
         parent::__construct($projectionRepository, $logger);
         $this->myProvider = $myProvider;
     }
@@ -526,18 +536,22 @@ class MyCachedProvider extends AbstractCachedProvider implements MyProviderInter
             },
             // Additional callables to do pre-processing before projecting the items to the cache. They are optional
             // and only called in the event of a cache miss (and after the data getter callable returns the data)
-            function(ProjectionItemIterableInterface $item, iterable $data): ?ProjectionItemIterableInterface {
-                // A case where I don't want to store the projection because it does not have relevant information 
+            function(ProjectionItemIterableInterface $item, iterable $data): ?iterable {
+                // A case where I don't want to store the projection because it does not have
+                // relevant information 
                 if($data['customer_id'] > 200) {
                     return null;
                 }
                 
                 // We could also add more info here...
-				// E.g.: we fetch some data from database but we need to call some external API to get additional data
+				// E.g.: we fetch some data from database, but we need to call some external API to get additional data
 				// This is a perfect place to do that
-                $item->setValue(500);
+				$data['new_value'] = 500;
+				
+				// We could also set/change properties on the item
+				$item->setUuid('f712e7af-41d0-4c3d-bbdb-0643197f9eed');
 
-                return $item;
+                return $data;
             }
         );        
     }
