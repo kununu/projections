@@ -5,7 +5,7 @@ namespace Kununu\Projections\Tests\Unit\Provider;
 
 final class MyProviderStub implements MyProviderStubInterface
 {
-    public function getData(int $id): ?array
+    public function getData(int $id): ?iterable
     {
         return
             $id === 1

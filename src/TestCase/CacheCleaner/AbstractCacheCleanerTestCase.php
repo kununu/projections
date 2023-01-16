@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Kununu\Projections\TestCase\CacheCleaner;
 
 use JMS\Serializer\SerializerInterface;
-use Kununu\Projections\CacheCleaner\CacheCleaner;
+use Kununu\Projections\CacheCleaner\CacheCleanerInterface;
 use Kununu\Projections\Exception\ProjectionException;
-use Kununu\Projections\ProjectionRepository;
+use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Repository\CachePoolProjectionRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -55,7 +55,7 @@ abstract class AbstractCacheCleanerTestCase extends TestCase
         $this->cacheCleaner->clear();
     }
 
-    abstract protected function getCacheCleaner(ProjectionRepository $projectionRepository, LoggerInterface $logger): CacheCleaner;
+    abstract protected function getCacheCleaner(ProjectionRepositoryInterface $projectionRepository, LoggerInterface $logger): CacheCleanerInterface;
 
     protected function setUp(): void
     {

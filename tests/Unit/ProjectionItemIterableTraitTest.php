@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kununu\Projections\Tests\Unit;
 
 use ArrayIterator;
 use BadMethodCallException;
-use Kununu\Projections\ProjectionItemIterable;
+use Kununu\Projections\ProjectionItemIterableInterface;
 use Kununu\Projections\ProjectionItemIterableTrait;
 use Kununu\Projections\Tag\Tags;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +14,7 @@ final class ProjectionItemIterableTraitTest extends TestCase
 {
     public function testTrait(): void
     {
-        $validClass = new class implements ProjectionItemIterable {
+        $validClass = new class() implements ProjectionItemIterableInterface {
             use ProjectionItemIterableTrait;
 
             public function getKey(): string
@@ -39,7 +40,7 @@ final class ProjectionItemIterableTraitTest extends TestCase
 
         $this->assertEquals(['a', 'b', 5], $validClass->data());
 
-        $invalidClass = new class {
+        $invalidClass = new class() {
             use ProjectionItemIterableTrait;
         };
 

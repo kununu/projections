@@ -1,24 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kununu\Projections\Tests\Unit\Repository;
 
 use JMS\Serializer\SerializerInterface;
-use Kununu\Projections\{
-    Exception\ProjectionException,
-    Repository\CachePoolProjectionRepository,
-    Tag\Tag,
-    Tag\Tags};
-use PHPUnit\Framework\{
-    MockObject\MockObject,
-    TestCase};
+use Kununu\Projections\Exception\ProjectionException;
+use Kununu\Projections\Repository\CachePoolProjectionRepository;
+use Kununu\Projections\Tag\Tag;
+use Kununu\Projections\Tag\Tags;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 
 final class CachePoolProjectionRepositoryTest extends TestCase
 {
-    /** @var TagAwareAdapterInterface|MockObject */
+    /** @var MockObject|TagAwareAdapterInterface */
     private $cachePool;
-
-    /** @var SerializerInterface|MockObject */
+    /** @var MockObject|SerializerInterface */
     private $serializer;
 
     public function testAdd(): void
@@ -75,7 +73,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
             ->expects($this->once())
             ->method('serialize')
             ->with($item, 'json')
-            ->willReturnCallback(function (ProjectionItemIterableDummy $item): string {
+            ->willReturnCallback(function(ProjectionItemIterableDummy $item): string {
                 return json_encode([
                     'key'   => $item->getKey(),
                     'stuff' => $item->getStuff(),

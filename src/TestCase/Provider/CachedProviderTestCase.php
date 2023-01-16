@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kununu\Projections\TestCase\Provider;
 
-use Kununu\Projections\ProjectionItemIterable;
-use Kununu\Projections\ProjectionRepository;
+use Kununu\Projections\ProjectionItemIterableInterface;
+use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Provider\AbstractCachedProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -20,19 +20,19 @@ abstract class CachedProviderTestCase extends TestCase
     /**
      * @dataProvider getAndCacheDataDataProvider
      *
-     * @param                             $originalProvider
-     * @param string                      $method
-     * @param array                       $args
-     * @param ProjectionItemIterable      $item
-     * @param ProjectionItemIterable|null $projectedItem
-     * @param iterable|null               $providerData
+     * @param                                      $originalProvider
+     * @param string                               $method
+     * @param array                                $args
+     * @param ProjectionItemIterableInterface      $item
+     * @param ProjectionItemIterableInterface|null $projectedItem
+     * @param iterable|null                        $providerData
      */
     public function testGetAndCacheData(
         $originalProvider,
         string $method,
         array $args,
-        ProjectionItemIterable $item,
-        ?ProjectionItemIterable $projectedItem,
+        ProjectionItemIterableInterface $item,
+        ?ProjectionItemIterableInterface $projectedItem,
         ?iterable $providerData
     ): void {
         // Get from cache
@@ -81,8 +81,13 @@ abstract class CachedProviderTestCase extends TestCase
      *
      * @return mixed|MockObject
      */
-    protected function createExternalProvider(string $providerClass, string $method, array $args, bool $expected, ?iterable $data)
-    {
+    protected function createExternalProvider(
+        string $providerClass,
+        string $method,
+        array $args,
+        bool $expected,
+        ?iterable $data
+    ): MockObject {
         $provider = $this->createMock($providerClass);
         $invocationMocker = $provider
             ->expects($expected ? $this->once() : $this->never())
@@ -97,12 +102,12 @@ abstract class CachedProviderTestCase extends TestCase
     }
 
     /**
-     * @return ProjectionRepository|MockObject
+     * @return MockObject|ProjectionRepositoryInterface
      */
-    protected function getProjectionRepository(): ProjectionRepository
+    protected function getProjectionRepository(): ProjectionRepositoryInterface
     {
         if (null === $this->projectionRepository) {
-            $this->projectionRepository = $this->createMock(ProjectionRepository::class);
+            $this->projectionRepository = $this->createMock(ProjectionRepositoryInterface::class);
         }
 
         return $this->projectionRepository;

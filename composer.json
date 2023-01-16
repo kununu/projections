@@ -14,7 +14,7 @@
     "symfony/browser-kit": "^4.4",
     "symfony/cache": "^4.4",
     "jms/serializer-bundle": "^3.8",
-    "kununu/testing-bundle": "^15.0",
+    "kununu/testing-bundle": "^16.0",
     "kununu/scripts": "*"
   },
   "suggest": {
@@ -29,6 +29,19 @@
   "autoload-dev": {
     "psr-4": {
       "Kununu\\Projections\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit --no-coverage tests",
+    "test-coverage": "phpunit --coverage-clover tests/.results/coverage.xml --coverage-html tests/.results/html/ tests"
+  },
+  "scripts-descriptions": {
+    "test": "Run all tests",
+    "test-coverage": "Run all tests with coverage report"
+  },
+  "config": {
+    "allow-plugins": {
+      "kununu/scripts": true
     }
   }
 }

@@ -5,5 +5,5 @@ namespace Kununu\Projections\Tests\Unit\Provider;
 
 interface MyProviderStubInterface
 {
-    public function getData(int $id): ?array;
+    public function getData(int $id): ?iterable;
 }
