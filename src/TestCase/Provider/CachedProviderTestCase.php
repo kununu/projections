@@ -26,6 +26,7 @@ abstract class CachedProviderTestCase extends TestCase
      * @param ProjectionItemIterableInterface      $item
      * @param ProjectionItemIterableInterface|null $projectedItem
      * @param iterable|null                        $providerData
+     * @param callable|null                        $preProjection
      */
     public function testGetAndCacheData(
         $originalProvider,
@@ -33,7 +34,8 @@ abstract class CachedProviderTestCase extends TestCase
         array $args,
         ProjectionItemIterableInterface $item,
         ?ProjectionItemIterableInterface $projectedItem,
-        ?iterable $providerData
+        ?iterable $providerData,
+        ?callable $preProjection = null
     ): void {
         // Get from cache
         ($repository = $this->getProjectionRepository())
@@ -44,11 +46,16 @@ abstract class CachedProviderTestCase extends TestCase
 
         // Cache miss
         if (null === $projectedItem && is_iterable($providerData)) {
+            $itemToProject = (clone $item)->storeData($providerData);
+            if (is_callable($preProjection)) {
+                $itemToProject = $preProjection($itemToProject);
+            }
+
             // Get data from provider
             $repository
                 ->expects($this->once())
                 ->method('add')
-                ->with((clone $item)->storeData($providerData));
+                ->with($itemToProject);
         }
 
         $result = call_user_func_array([$this->getProvider($originalProvider), $method], $args);
