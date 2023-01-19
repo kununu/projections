@@ -609,7 +609,21 @@ public function getCustomerDataDataProvider(): array
             $args, // Arguments to your method (int this case: [123 <- $customerId])
             $item, // Projection item to search in cache (e.g. new CustomerByIdProjectionItem(123))
             $projectedItem, // Projected item to be return by the projection repository (null to simulate a cache miss)
-            $expectedProviderData, // Expected result
+            $providerData, // Expected result
+            // Optional, by default is null and only required when you are doing manipulations on your cached provider
+            // before projecting the item to the cache.
+            //
+            // To test this cases you can change the item as you expect it before doing the projection
+            // The $item received here is a clone of the $item defined above and if $providerData is iterable it is already
+            // injected in the item via the storeData method
+            function($itemToProject) {
+                // Do something to the item before adding it to the cache
+                // E.g. set a property on the item that usually is set on the pre-projection callables of the
+                // getAndCacheData method of the cached provider              
+                $itemToProject->setField('a value');
+
+                return $itemToProject;
+            }
         ]
     ]; 
 }
