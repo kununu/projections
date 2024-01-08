@@ -9,13 +9,13 @@ use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Serializer\CacheSerializerInterface;
 use Kununu\Projections\Tag\Tags;
 use Psr\Cache\CacheItemInterface;
-use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
-final class CachePoolProjectionRepository implements ProjectionRepositoryInterface
+abstract class AbstractProjectionRepository implements ProjectionRepositoryInterface
 {
     public function __construct(
-        private TagAwareAdapterInterface $cachePool,
-        private CacheSerializerInterface $serializer
+        protected CacheItemPoolInterface $cachePool,
+        protected CacheSerializerInterface $serializer
     ) {
     }
 
@@ -62,18 +62,12 @@ final class CachePoolProjectionRepository implements ProjectionRepositoryInterfa
         }
     }
 
-    public function deleteByTags(Tags $tags): void
-    {
-        if (!$this->cachePool->invalidateTags($tags->raw())) {
-            throw new ProjectionException('Not possible to delete projection items on cache pool based on tag');
-        }
-    }
+    abstract public function deleteByTags(Tags $tags): void;
 
-    private function createCacheItem(ProjectionItemInterface $item): CacheItemInterface
+    protected function createCacheItem(ProjectionItemInterface $item): CacheItemInterface
     {
         $cacheItem = $this->cachePool->getItem($item->getKey());
         $cacheItem->set($this->serializer->serialize($item));
-        $cacheItem->tag($item->getTags()->raw());
 
         return $cacheItem;
     }

@@ -29,13 +29,6 @@ final class ProjectionItemIterableStub implements ProjectionItemIterableInterfac
         return $this->stuff;
     }
 
-    public function setStuff(string $stuff): self
-    {
-        $this->stuff = $stuff;
-
-        return $this;
-    }
-
     public function getKey(): string
     {
         return sprintf(self::PROJECTION_KEY, $this->id);

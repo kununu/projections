@@ -6,7 +6,7 @@ namespace Kununu\Projections\TestCase\CacheCleaner;
 use Kununu\Projections\CacheCleaner\CacheCleanerInterface;
 use Kununu\Projections\Exception\ProjectionException;
 use Kununu\Projections\ProjectionRepositoryInterface;
-use Kununu\Projections\Repository\CachePoolProjectionRepository;
+use Kununu\Projections\Repository\SymfonyCacheProjectionRepository;
 use Kununu\Projections\Serializer\CacheSerializerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -75,7 +75,7 @@ abstract class AbstractCacheCleanerTestCase extends TestCase
         $this->cachePool = $this->createMock(TagAwareAdapterInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->cacheCleaner = $this->getCacheCleaner(
-            new CachePoolProjectionRepository($this->cachePool, $this->createMock(CacheSerializerInterface::class)),
+            new SymfonyCacheProjectionRepository($this->cachePool, $this->createMock(CacheSerializerInterface::class)),
             $this->logger
         );
     }

@@ -37,8 +37,9 @@
   "suggest": {
     "ext-igbinary": "To use IgBinary cache serializers",
     "ext-zlib": "To use deflated cache serializers",
-    "symfony/cache": "To use CachePoolProjectionRepository",
     "jms/serializer": "To use JMSSerializer cache serializers",
+    "symfony/cache": "To use SymfonyCacheProjectionRepository",
+    "symfony/property-access": "To use Symfony Serializer cache serializers",
     "symfony/serializer": "To use Symfony Serializer cache serializers"
   },
   "autoload": {
