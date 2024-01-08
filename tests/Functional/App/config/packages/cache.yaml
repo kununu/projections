@@ -1,5 +1,0 @@
-framework:
-  cache:
-    pools:
-      app.cache.projections:
-        adapter: cache.adapter.array

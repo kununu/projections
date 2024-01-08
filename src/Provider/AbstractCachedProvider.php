@@ -6,19 +6,24 @@ namespace Kununu\Projections\Provider;
 use Kununu\Projections\ProjectionItemIterableInterface;
 use Kununu\Projections\ProjectionRepositoryInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 abstract class AbstractCachedProvider
 {
     private const CACHE_KEY = 'cache_key';
-    private const DATA = 'data';
+    private const CLASS_KEY = 'class';
+    private const DATA_KEY = 'data';
 
-    private $projectionRepository;
-    private $logger;
+    public function __construct(
+        private ProjectionRepositoryInterface $projectionRepository,
+        private LoggerInterface $logger,
+        private string $logLevel = LogLevel::INFO
+    ) {
+    }
 
-    public function __construct(ProjectionRepositoryInterface $projectionRepository, LoggerInterface $logger)
+    protected function logger(): LoggerInterface
     {
-        $this->projectionRepository = $projectionRepository;
-        $this->logger = $logger;
+        return $this->logger;
     }
 
     protected function getAndCacheData(
@@ -26,22 +31,20 @@ abstract class AbstractCachedProvider
         callable $dataGetter,
         callable ...$preProjections
     ): ?iterable {
-        $this->logger->info('Getting data from cache', [self::CACHE_KEY => $item->getKey()]);
+        $key = $item->getKey();
+
+        $this->log('Getting data from cache', $key);
 
         $projectedItem = $this->projectionRepository->get($item);
         if ($projectedItem instanceof ProjectionItemIterableInterface) {
-            $this->logger->info(
-                'Item hit! Returning data from the cache',
-                [
-                    self::CACHE_KEY => $item->getKey(),
-                    self::DATA      => $projectedItem->data(),
-                ]
-            );
+            $data = $projectedItem->data();
 
-            return $projectedItem->data();
+            $this->log('Item hit! Returning data from the cache', $key, $data);
+
+            return $data;
         }
 
-        $this->logger->info('Item not hit! Fetching data...', [self::CACHE_KEY => $item->getKey()]);
+        $this->log('Item not hit! Fetching data...', $key);
 
         $data = $dataGetter();
 
@@ -52,8 +55,7 @@ abstract class AbstractCachedProvider
                 // If pre-projection callable returns null means we do not have relevant information.
                 // We will not store the item in the cache and will break the pre-projection chain
                 if (null === $data) {
-                    $this->logger->info('Item not stored in the cache!', [self::DATA => $data]);
-                    $data = null;
+                    $this->log('Item not stored in the cache!', $key);
 
                     break;
                 }
@@ -61,13 +63,10 @@ abstract class AbstractCachedProvider
 
             if (null !== $data) {
                 $this->projectionRepository->add($item->storeData($data));
-                $this->logger->info(
-                    'Item saved into cache and returned',
-                    [self::CACHE_KEY => $item->getKey(), self::DATA => $data]
-                );
+                $this->log('Item saved into cache and returned', $key, $data);
             }
         } else {
-            $this->logger->info('No data fetched and stored into cache!', [self::CACHE_KEY => $item->getKey()]);
+            $this->log('No data fetched and stored into cache!', $key);
             $data = null;
         }
 
@@ -76,9 +75,21 @@ abstract class AbstractCachedProvider
 
     protected function invalidateCacheItemByKey(ProjectionItemIterableInterface $projectionItem): self
     {
-        $this->logger->info('Deleting cache item', ['cache_key' => $projectionItem->getKey()]);
+        $this->log('Deleting cache item', $projectionItem->getKey());
         $this->projectionRepository->delete($projectionItem);
 
         return $this;
+    }
+
+    private function log(string $message, string $cacheKey, mixed $data = null): void
+    {
+        $this->logger->log(
+            $this->logLevel,
+            $message,
+            array_merge(
+                [self::CACHE_KEY => $cacheKey, self::CLASS_KEY => static::class],
+                $data ? [self::DATA_KEY => $data] : []
+            )
+        );
     }
 }

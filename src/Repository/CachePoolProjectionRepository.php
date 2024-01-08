@@ -3,25 +3,20 @@ declare(strict_types=1);
 
 namespace Kununu\Projections\Repository;
 
-use JMS\Serializer\SerializerInterface;
 use Kununu\Projections\Exception\ProjectionException;
 use Kununu\Projections\ProjectionItemInterface;
 use Kununu\Projections\ProjectionRepositoryInterface;
+use Kununu\Projections\Serializer\CacheSerializerInterface;
 use Kununu\Projections\Tag\Tags;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 
 final class CachePoolProjectionRepository implements ProjectionRepositoryInterface
 {
-    private const JMS_SERIALIZER_FORMAT = 'json';
-
-    private $cachePool;
-    private $serializer;
-
-    public function __construct(TagAwareAdapterInterface $cachePool, SerializerInterface $serializer)
-    {
-        $this->cachePool = $cachePool;
-        $this->serializer = $serializer;
+    public function __construct(
+        private TagAwareAdapterInterface $cachePool,
+        private CacheSerializerInterface $serializer
+    ) {
     }
 
     public function add(ProjectionItemInterface $item): void
@@ -57,7 +52,7 @@ final class CachePoolProjectionRepository implements ProjectionRepositoryInterfa
             return null;
         }
 
-        return $this->serializer->deserialize($cacheItem->get(), get_class($item), self::JMS_SERIALIZER_FORMAT);
+        return $this->serializer->deserialize($cacheItem->get(), $item::class);
     }
 
     public function delete(ProjectionItemInterface $item): void
@@ -77,7 +72,7 @@ final class CachePoolProjectionRepository implements ProjectionRepositoryInterfa
     private function createCacheItem(ProjectionItemInterface $item): CacheItemInterface
     {
         $cacheItem = $this->cachePool->getItem($item->getKey());
-        $cacheItem->set($this->serializer->serialize($item, self::JMS_SERIALIZER_FORMAT));
+        $cacheItem->set($this->serializer->serialize($item));
         $cacheItem->tag($item->getTags()->raw());
 
         return $cacheItem;

@@ -14,20 +14,6 @@ It also includes an implementation of the projection over the Symfony's Tag Awar
 
 ## Installation
 
-### Add custom private repositories to composer.json
-
-```json
-{
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/kununu/projections.git",
-      "no-api": true
-    }
-  ]
-}
-```
-
 ### Require this library to your project
 
 ```bash
@@ -38,10 +24,15 @@ composer require kununu/projections
  
 ```bash
 composer require symfony/cache
+```
+
+Also you will need to include a serializer (e.g. JMSSerializer)
+
+```bash
 composer require jms/serializer
 ```
 
-If you want to use this library on a Symfony App you may want to require the `jms/serializer-bundle` instead of `jms/serializer`
+(Or, in this example, if you want to use this library on a Symfony App you may want to require the `jms/serializer-bundle` instead of `jms/serializer`)
 
 ```bash
 composer require jms/serializer-bundle
@@ -575,7 +566,7 @@ Just make you test class extend it and override the `METHODS` constant and imple
 The `getProvider` is where you should create the "decorated" cached provider you want to test. E.g:
 
 ```php
-protected function getProvider($originalProvider): AbstractCachedProvider
+protected function getProvider(mixed $originalProvider): AbstractCachedProvider
 {
     return new MyCachedProvider($originalProvider, $this->getProjectionRepository(), $this->getLogger());
 }
@@ -600,7 +591,7 @@ Now, for each method defined in the `METHODS` constant you need to create a PHPU
 So in this case you would have to create a method called `getCustomerDataDataProvider`:
 
 ```php
-public function getCustomerDataDataProvider(): array
+public static function getCustomerDataDataProvider(): array
 {
     return [
         'my_test_case_1' => [
@@ -632,7 +623,7 @@ public function getCustomerDataDataProvider(): array
 If you want to mock the original provider you can do it with the `createExternalProvider`:
 
 ```php
-protected function createExternalProvider(string $providerClass, string $method, array $args, bool $expected, ?iterable $data);
+protected static function createExternalProvider(string $providerClass, string $method, array $args, bool $expected, ?iterable $data): MockObject
 ```
 
 - `$providerClass` - The class/interface of your original provider
@@ -644,7 +635,7 @@ protected function createExternalProvider(string $providerClass, string $method,
 Example:
 
 ```php
-$originalProvider = $this->createExternalProvider(
+$originalProvider = self::createExternalProvider(
     MyProviderInterface::class,
     'getCustomerData',
     [123],

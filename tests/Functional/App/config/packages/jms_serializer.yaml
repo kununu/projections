@@ -1,4 +1,0 @@
-jms_serializer:
-  default_context:
-    serialization:
-      serialize_null: true

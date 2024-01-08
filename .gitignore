@@ -1,6 +1,5 @@
 .idea
 tests/.results
-tests/Functional/App/var/
 vendor
 composer.lock
 .php_cs.cache

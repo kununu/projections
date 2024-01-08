@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<serializer>
-    <class name="Kununu\Projections\Tests\Functional\App\Repository\ProjectionItemStub">
-        <property name="id" type="string"/>
-    </class>
-</serializer>

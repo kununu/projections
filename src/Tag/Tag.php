@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace Kununu\Projections\Tag;
 
-final class Tag
-{
-    private $tag;
+use Stringable;
 
-    public function __construct(string $tag)
+final class Tag implements Stringable
+{
+    public function __construct(private string $tag)
     {
-        $this->tag = $tag;
     }
 
     public function __toString(): string
