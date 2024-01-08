@@ -19,7 +19,6 @@ jobs:
         php-version:
           - 8.0
         dependencies:
-          - lowest
           - highest
 
     steps:

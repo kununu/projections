@@ -83,13 +83,14 @@ abstract class AbstractCachedProvider
 
     private function log(string $message, string $cacheKey, mixed $data = null): void
     {
-        $this->logger->log(
-            $this->logLevel,
-            $message,
-            array_merge(
-                [self::CACHE_KEY => $cacheKey, self::CLASS_KEY => static::class],
-                $data ? [self::DATA_KEY => $data] : []
-            )
-        );
+        $this->logger()
+            ->log(
+                $this->logLevel,
+                $message,
+                array_merge(
+                    [self::CACHE_KEY => $cacheKey, self::CLASS_KEY => static::class],
+                    $data ? [self::DATA_KEY => $data] : []
+                )
+            );
     }
 }

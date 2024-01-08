@@ -1,41 +1,41 @@
 <?php
 declare(strict_types=1);
 
-namespace Kununu\Projections\Tests\Provider;
+namespace Kununu\Projections\Tests\Stubs\Provider;
 
 use Kununu\Projections\ProjectionItemIterableInterface;
 use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Provider\AbstractCachedProvider;
+use Kununu\Projections\Tests\Stubs\ProjectionItem\ProjectionItemIterableStub;
 use Psr\Log\LoggerInterface;
 
-final class MyCachedProviderStub extends AbstractCachedProvider implements MyProviderStubInterface
+final class CachedProviderStub extends AbstractCachedProvider implements ProviderStubInterface
 {
-
     public function __construct(
-        private MyProviderStubInterface $provider,
+        private ProviderStubInterface $provider,
         ProjectionRepositoryInterface $projectionRepository,
         LoggerInterface $logger
     ) {
         parent::__construct($projectionRepository, $logger);
     }
 
-    public function getData(int $id): ?iterable
+    public function getData(string $id): ?iterable
     {
         return $this->getAndCacheData(
-            new MyStubProjectionItem($id),
+            new ProjectionItemIterableStub($id),
             fn(): ?iterable => $this->provider->getData($id),
             function(ProjectionItemIterableInterface $item, iterable $data): ?iterable {
-                assert($item instanceof MyStubProjectionItem);
+                assert($item instanceof ProjectionItemIterableStub);
 
-                return $item->getKey() === 'my_data_3'
+                return $item->getKey() === 'test_iterable_2'
                     ? null
                     : $data;
             }
         );
     }
 
-    public function invalidateItem(int $id): void
+    public function invalidateItem(string $id): void
     {
-        $this->invalidateCacheItemByKey(new MyStubProjectionItem($id));
+        $this->invalidateCacheItemByKey(new ProjectionItemIterableStub($id));
     }
 }

@@ -26,6 +26,7 @@ abstract class AbstractCachedProviderTestCase extends TestCase
         ProjectionItemIterableInterface $item,
         ?ProjectionItemIterableInterface $projectedItem,
         ?iterable $providerData,
+        ?iterable $expectedResult = null,
         ?callable $preProjection = null
     ): void {
         // Get from cache
@@ -42,16 +43,22 @@ abstract class AbstractCachedProviderTestCase extends TestCase
                 $itemToProject = $preProjection($itemToProject);
             }
 
-            // Get data from provider
-            $repository
-                ->expects($this->once())
-                ->method('add')
-                ->with($itemToProject);
+            if ($expectedResult && $itemToProject) {
+                // Add data to the cache
+                $repository
+                    ->expects($this->once())
+                    ->method('add')
+                    ->with($itemToProject);
+            } else {
+                $repository
+                    ->expects($this->never())
+                    ->method('add');
+            }
         }
 
         $result = call_user_func_array([$this->getProvider($originalProvider), $method], $args);
 
-        $this->assertEquals($providerData, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     public static function getAndCacheDataDataProvider(): array

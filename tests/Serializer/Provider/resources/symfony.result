@@ -1,1 +1,1 @@
-{"id":123456789,"name":"My Name","data":{"extra":{"address":"Whatever","ssid":45734,"active":true}}}
+{"id":"123456789","stuff":"My Name","data":{"extra":{"address":"Whatever","ssid":45734,"active":true}}}

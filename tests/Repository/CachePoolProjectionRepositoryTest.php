@@ -8,6 +8,9 @@ use Kununu\Projections\Repository\CachePoolProjectionRepository;
 use Kununu\Projections\Serializer\CacheSerializerInterface;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
+use Kununu\Projections\Tests\Stubs\CacheItem\CacheItemStub;
+use Kununu\Projections\Tests\Stubs\ProjectionItem\ProjectionItemIterableStub;
+use Kununu\Projections\Tests\Stubs\ProjectionItem\ProjectionItemStub;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
@@ -21,7 +24,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
     {
         $cacheItemStub = new CacheItemStub('id_item');
 
-        $item = new ProjectionItemDummy('id_item');
+        $item = new ProjectionItemStub('id_item');
 
         $this->cachePool
             ->expects($this->once())
@@ -47,18 +50,18 @@ final class CachePoolProjectionRepositoryTest extends TestCase
         $this->assertEquals(['test', 'kununu', 'id_item'], $cacheItemStub->getTags());
     }
 
-    public function testAddItemArrayData(): void
+    public function testAddIterable(): void
     {
         $cacheItemStub = new CacheItemStub('id_item');
 
-        $item = new ProjectionItemIterableDummy('id_item');
+        $item = new ProjectionItemIterableStub('id_item');
         $item->setStuff('itn');
         $item->storeData(['id' => 'beiga', 'value' => 1000]);
 
         $this->cachePool
             ->expects($this->once())
             ->method('getItem')
-            ->with('test_item_iterable_id_item')
+            ->with('test_iterable_id_item')
             ->willReturn($cacheItemStub);
 
         $this->cachePool
@@ -70,9 +73,9 @@ final class CachePoolProjectionRepositoryTest extends TestCase
             ->expects($this->once())
             ->method('serialize')
             ->with($item)
-            ->willReturnCallback(fn(ProjectionItemIterableDummy $item): string => json_encode([
+            ->willReturnCallback(fn(ProjectionItemIterableStub $item): string => json_encode([
                 'key'   => $item->getKey(),
-                'stuff' => $item->getStuff(),
+                'stuff' => $item->stuff(),
                 'data'  => $item->data(),
             ]));
 
@@ -80,7 +83,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
         $cachePoolProjectionRepository->add($item);
 
         $this->assertEquals(
-            '{"key":"test_item_iterable_id_item","stuff":"itn","data":{"id":"beiga","value":1000}}',
+            '{"key":"test_iterable_id_item","stuff":"itn","data":{"id":"beiga","value":1000}}',
             $cacheItemStub->get()
         );
         $this->assertEquals(['test', 'kununu', 'id_item'], $cacheItemStub->getTags());
@@ -91,7 +94,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
         $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to add projection item on cache pool');
 
-        $item = new ProjectionItemDummy('id_item');
+        $item = new ProjectionItemStub('id_item');
 
         $this->cachePool
             ->expects($this->once())
@@ -118,7 +121,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
     {
         $cacheItemStub = new CacheItemStub('id_item');
 
-        $item = new ProjectionItemDummy('id_item');
+        $item = new ProjectionItemStub('id_item');
 
         $this->cachePool
             ->expects($this->once())
@@ -153,7 +156,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
         $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to save deferred projection item on cache pool');
 
-        $item = new ProjectionItemDummy('id_item');
+        $item = new ProjectionItemStub('id_item');
 
         $this->cachePool
             ->expects($this->once())
@@ -182,8 +185,8 @@ final class CachePoolProjectionRepositoryTest extends TestCase
 
     public function testGetExistentItem(): void
     {
-        $projectionItem = new ProjectionItemDummy('id_item');
-        $projectionItemOnCache = new ProjectionItemDummy('id_item');
+        $projectionItem = new ProjectionItemStub('id_item');
+        $projectionItemOnCache = new ProjectionItemStub('id_item');
 
         $cacheItem = (new CacheItemStub('id_item'))
             ->setHit()
@@ -209,7 +212,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
 
     public function testGetNonExistentItem(): void
     {
-        $projectionItem = new ProjectionItemDummy('id_item');
+        $projectionItem = new ProjectionItemStub('id_item');
 
         $cacheItem = (new CacheItemStub('id_item'))
             ->setNotHit();
@@ -236,7 +239,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
             ->method('deleteItem')
             ->willReturn(true);
 
-        $item = new ProjectionItemDummy('id_item');
+        $item = new ProjectionItemStub('id_item');
 
         $cachePoolProjectionRepository = new CachePoolProjectionRepository($this->cachePool, $this->serializer);
         $cachePoolProjectionRepository->delete($item);
@@ -252,7 +255,7 @@ final class CachePoolProjectionRepositoryTest extends TestCase
             ->method('deleteItem')
             ->willReturn(false);
 
-        $item = new ProjectionItemDummy('id_item');
+        $item = new ProjectionItemStub('id_item');
 
         $cachePoolProjectionRepository = new CachePoolProjectionRepository($this->cachePool, $this->serializer);
         $cachePoolProjectionRepository->delete($item);

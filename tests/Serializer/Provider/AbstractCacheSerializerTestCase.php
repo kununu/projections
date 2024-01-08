@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kununu\Projections\Tests\Serializer\Provider;
 
 use Kununu\Projections\Serializer\CacheSerializerInterface;
+use Kununu\Projections\Tests\Stubs\ProjectionItem\ProjectionItemIterableStub;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractCacheSerializerTestCase extends TestCase
@@ -11,7 +12,7 @@ abstract class AbstractCacheSerializerTestCase extends TestCase
     protected const RESULT_FILE = '';
 
     private CacheSerializerInterface $serializer;
-    private MyItemStub $item;
+    private ProjectionItemIterableStub $item;
     private mixed $serializedResult;
 
     public function testSerialize(): void
@@ -23,7 +24,7 @@ abstract class AbstractCacheSerializerTestCase extends TestCase
 
     public function testDeserialize(): void
     {
-        $result = $this->serializer->deserialize($this->serializedResult, MyItemStub::class);
+        $result = $this->serializer->deserialize($this->serializedResult, ProjectionItemIterableStub::class);
 
         $this->assertEquals($result, $this->item);
     }
@@ -33,7 +34,7 @@ abstract class AbstractCacheSerializerTestCase extends TestCase
     protected function setUp(): void
     {
         $this->serializer = $this->getSerializer();
-        $this->item = new MyItemStub(123456789, 'My Name');
+        $this->item = new ProjectionItemIterableStub('123456789', 'My Name');
         $this->item->storeData(['extra' => ['address' => 'Whatever', 'ssid' => 45734, 'active' => true]]);
         $this->serializedResult = file_get_contents($this->getResultFile());
     }

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kununu\Projections\Tests\Repository;
+namespace Kununu\Projections\Tests\Stubs\CacheItem;
 
 use DateInterval;
 use DateTimeInterface;
