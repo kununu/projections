@@ -23,7 +23,7 @@ As we already have seen, the `ProjectionRepositoryInterface` already has a metho
 
 So your cache cleaner class by tags should be instantiated with a `ProjectionRepositoryInterface` instance (and also with a PSR logger instance), and simply implement the `getTags` method which must return the `Tags` collection that will be passed to the `deleteByTags` on the repository instance.
 
-Note: Tour implementation of `ProjectionRepositoryInterface` must be compatible with tags, otherwise this will fail!
+*Note*: Your implementation of `ProjectionRepositoryInterface` **must be compatible with tags**, otherwise this will fail!
 
 ```php
 public function __construct(
