@@ -2,7 +2,7 @@
 
 ## ProjectionRepositoryInterface
 
-The [projection item](docs/projection-item.md) is projected through a repository which implements `ProjectionRepositoryInterface` interface.
+The [projection item](projection-item.md) is projected through a repository which implements `ProjectionRepositoryInterface` interface.
 
 This holds methods to get, add and delete the projections. The methods are used by passing a **projection item** object.
 

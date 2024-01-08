@@ -28,7 +28,7 @@ protected function getAndCacheData(
 ): ?iterable;
 ```
 
-- The `$item` parameter is a [projection item](docs/projection-item.md) that will be used to build the cache key
+- The `$item` parameter is a [projection item](projection-item.md) that will be used to build the cache key
 - The `$dataGetter` is your custom function that should return an `iterable` with you data or null if no data was found
     - Signature of the callable function:
         - `function(): ?iterable`
