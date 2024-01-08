@@ -79,19 +79,22 @@ final class MyCachedProvider extends AbstractCachedProvider implements MyProvide
     {
         return $this->getAndCacheData(
             new CustomerByIdProjectionItem($customerId),
-            // This callable will get the data when there is a cache miss (e.g. data was not found on the cache)
+            // This callable will get the data when there is a cache miss
+            // (e.g. data was not found on the cache)
             fn(): ?iterable  => $this->myProvider->getCustomerData($customerId),
-            // Additional callables to do pre-processing before projecting the items to the cache. They are optional
-            // and only called in the event of a cache miss (and after the data getter callable returns the data)
+            // Additional callables to do pre-processing before projecting the
+            // items to the cache. They are optional and only called in the event of
+            // a cache miss (and after the data getter callable returns the data)
             function(ProjectionItemIterableInterface $item, iterable $data): ?iterable {
-                // A case where I don't want to store the projection because it does not have
-                // relevant information 
+                // A case where I don't want to store the projection
+                // because it does not have relevant information 
                 if($data['customer_id'] > 200) {
                     return null;
                 }
                 
                 // We could also add more info here...
-				// E.g.: we fetch some data from database, but we need to call some external API to get additional data
+				// E.g.: we fetch some data from database, but we need
+				// to call some external API to get additional data.
 				// This is a perfect place to do that
 				$data['new_value'] = 500;
 				
@@ -162,8 +165,8 @@ public static function getCustomerDataDataProvider(): array
             // before projecting the item to the cache.
             //
             // To test this cases you can change the item as you expect it before doing the projection
-            // The $item received here is a clone of the $item defined above and if $providerData is iterable it is already
-            // injected in the item via the storeData method
+            // The $item received here is a clone of the $item defined above and if $providerData is iterable it
+            // is already injected in the item via the storeData method
             function($itemToProject) {
                 // Do something to the item before adding it to the cache
                 // E.g. set a property on the item that usually is set on the pre-projection callables of the
