@@ -1,6 +1,10 @@
 # Integration with Symfony
 
-#### Usage with Symfony >= 4.0
+If you want to use this library in a Symfony application, then it's recommended to use the `SymfonyCacheProjectionRepository` (with `symfony/cache` as the backend provider for caches).
+
+In this example we will also show how to use the [JMS Serializer Bundle](https://github.com/schmittjoh/JMSSerializerBundle) as the serialization provider.
+
+## Define the cache pool(s)
 
 Create a cache pool with Symfony config. Here's an example for the cache pool to use Memcached:
 
@@ -17,56 +21,37 @@ framework:
 
 This automatically creates a `example.cache.projections` service. In this case the lifetime for the projections is 3600 seconds = 1 hour.
 
-Here is assumed that the `jms/serializer-bundle` was required. The minimum configuration you need for the JMS Serializer Bundle is:
+## Configure your serialization details
 
+Your mileage may vary. Here we are using XML files to configure the serialization.
+
+### Configure JMS serializer
+
+Create a `jms_serializer.yaml` to configure your serialization and import it in one of your services yaml files.
+
+`services.yaml`
+
+```yaml
+imports:
+  - { resource: jms_serializer.yaml }
+services:  
+```
+
+`jms_serializer.yaml`
 ```yaml
 jms_serializer:
   metadata:
     directories:
       projections:
         namespace_prefix: "Kununu\Example"
-        path: "%kernel.root_dir%/Repository/Resources/config/serializer"
+        path: "%kernel.project_dir%/src/Repository/Resources/config/serializer"
 ```
 
-where `%kernel.root_dir%/Repository/Resources/config/serializer` is the directory where is the JMS Serializer configuration files for the projection items, which means the previous `ExampleProjectionItem.xml` file is inside.
+where `%kernel.project_dir%/src/Repository/Resources/config/serializer` is the directory where the JMS Serializer configuration files for the projection items.
 
-Please notice that the namespace prefix of the projection item class is also defined in here.
+### Define XML serialization
 
-Next define your custom instance of `CachePoolProjectionRepository` as a Symfony service:
-
-```yaml
-services:
-  _defaults:
-    autowire: true
-    autoconfigure: true
-
-  #  A tag-aware cache adapter
-  example.cache.projections.tagged:
-    class: Symfony\Component\Cache\Adapter\TagAwareAdapter
-    decorates: 'example.cache.projections'
-
-  # My cached repository
-  app.my.cached.repository:
-    class: Kununu\Projections\Repository\CachePoolProjectionRepository
-    arguments:
-      - '@example.cache.projections'
-      - '@jms_serializer'
-
-```
-
-Note that the `TagAwareAdapter` is added as a decorator for the cache pool service.
-
-Now you can inject the repository's service. Example:
-
-```yaml
-App\Infrastructure\UseCase\Query\GetProfileCommonByUuid\DataProvider\ProjectionDataProvider:
-  arguments:
-    - '@app.my.cached.repository'
-```
-
-#### Configure the serialization
-
-For JMS Serializer you should need to configure the serialization.  Here is an example of the JMS Serializer XML config:
+Create a `ExampleProjectionItem.xml` inside the directory mentioned above. Please notice that the namespace prefix of the projection item class is also defined in here.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -78,29 +63,64 @@ For JMS Serializer you should need to configure the serialization.  Here is an e
 </serializer>
 ```
 
-This should be saved in a `ExampleProjectionItem.xml` file.
-
-The data that you want projected needs exist on the serializer config in order to be actually projected.
-
 In this example you can see that the two properties of the projection item are on the config.
 
-This configuration needs to be loaded into the JMS Serializer and the repository needs to be instantiated in order to be used.
+## Configure you projection repository
 
+Next define your custom instance of `SymfonyCacheProjectionRepository` as a Symfony service:
+
+```yaml
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  #  A tag-aware cache adapter
+  example.cache.projections.tagged:
+    class: Symfony\Component\Cache\Adapter\TagAwareAdapter
+    decorates: 'example.cache.projections'
+    
+  # We want to use the JMSCacheSerializer which is a wrapper for JMS Serializer
+  example.cache.jms_serializer:
+    class: Kununu\Projections\Serializer\Provider\JMSCacheSerializer
+    arguments:
+      - '@jms_serializer'
+
+  # My cached repository
+  example.my.cached.repository:
+    class: Kununu\Projections\Repository\SymfonyCacheProjectionRepository
+    arguments:
+      - '@example.cache.projections'
+      - '@example.cache.jms_serializer'
+```
+
+Note that the `TagAwareAdapter` is added as a decorator for the cache pool service.
+
+## Use the repository
+
+Now you can inject the repository service in your classes that need to use it.
+
+Example:
+
+```yaml
+Kununu\Example\MyProvider:
+  arguments:
+    - '@example.my.cached.repository'
+```
 
 And inside the respective class we should depend only on the `ProjectionRepositoryInterface` interface instance to project/get/delete data from the cache.
 
 ```php
+namespace Kununu\Example;
+
 use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
 
-final class ProjectionDataProvider
+final class MyProvider
 {
-    private $projectionRepository;
-
-    public function __construct(ProjectionRepositoryInterface $projectionRepository)
+    public function __construct(private ProjectionRepositoryInterface $projectionRepository)
     {
-        $this->projectionRepository = $projectionRepository;
     }
 
 	public function someAction(): void
