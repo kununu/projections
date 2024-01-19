@@ -47,3 +47,9 @@ composer require jms/serializer-bundle
 
 ## Integrations
 - [Symfony Integrations](docs/symfony.md)
+
+------------------------------
+
+![Continuous Integration](https://github.com/kununu/projections/actions/workflows/continuous-integration.yml/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=kununu_projections&metric=alert_status)](https://sonarcloud.io/dashboard?id=kununu_projections)
+
