@@ -1,25 +1,46 @@
 {
   "name": "kununu/projections",
-  "license": "proprietary",
-  "description": "Kununu Projections",
+  "description": "Handle projections of items to cache",
+  "type": "library",
+  "license": "MIT",
   "minimum-stability": "stable",
+  "keywords": [
+    "cache",
+    "projections",
+    "symfony"
+  ],
+  "authors": [
+    {
+      "name": "Diogo Rocha",
+      "email": "diogo.rocha@kununu.com"
+    },
+    {
+      "name": "Hugo Gonçalves",
+      "email": "hugo.goncalves@kununu.com"
+    }
+  ],
   "require": {
-    "php": ">=7.2"
+    "php": ">=8.0"
   },
   "require-dev": {
     "ext-json": "*",
-    "phpunit/phpunit": "^8.5",
-    "symfony/framework-bundle": "^4.4",
-    "symfony/yaml": "^4.4",
-    "symfony/browser-kit": "^4.4",
-    "symfony/cache": "^4.4",
-    "jms/serializer-bundle": "^3.8",
-    "kununu/testing-bundle": "^16.0",
-    "kununu/scripts": "*"
+    "ext-igbinary": "*",
+    "ext-zlib": "*",
+    "phpunit/phpunit": "^9.6",
+    "kununu/scripts": ">=4.0",
+    "symfony/yaml": "^5.4",
+    "symfony/cache": "^5.4",
+    "jms/serializer": "^3.28",
+    "symfony/serializer": "^5.4",
+    "symfony/property-access": "^5.4"
   },
   "suggest": {
-    "symfony/cache": "^4.0",
-    "jms/serializer": "^2.0|^3.0"
+    "ext-igbinary": "To use IgBinary cache serializers",
+    "ext-zlib": "To use deflated cache serializers",
+    "jms/serializer": "To use JMSSerializer cache serializers",
+    "symfony/cache": "To use SymfonyCacheProjectionRepository",
+    "symfony/property-access": "To use Symfony Serializer cache serializers",
+    "symfony/serializer": "To use Symfony Serializer cache serializers"
   },
   "autoload": {
     "psr-4": {
@@ -33,7 +54,7 @@
   },
   "scripts": {
     "test": "phpunit --no-coverage tests",
-    "test-coverage": "phpunit --coverage-clover tests/.results/coverage.xml --coverage-html tests/.results/html/ tests"
+    "test-coverage": "XDEBUG_MODE=coverage phpunit --coverage-clover tests/.results/coverage.xml --coverage-html tests/.results/html/ tests"
   },
   "scripts-descriptions": {
     "test": "Run all tests",

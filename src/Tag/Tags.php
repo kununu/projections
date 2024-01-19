@@ -5,7 +5,7 @@ namespace Kununu\Projections\Tag;
 
 final class Tags
 {
-    private $tags = [];
+    private array $tags = [];
 
     public function __construct(Tag ...$tags)
     {
