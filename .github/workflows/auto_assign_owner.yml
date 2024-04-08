@@ -8,6 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Auto assign owner
-        uses: danielswensson/auto-assign-owner-action@v1.0.2
+        uses: danielswensson/auto-assign-owner-action@v1.0.6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

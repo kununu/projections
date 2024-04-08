@@ -15,7 +15,7 @@ final class ProjectionTagGeneratorTest extends TestCase
     {
         $tags = $this::createTagsFromArray('tag_1', 'tag_2');
 
-        $this->assertInstanceOf(Tags::class, $tags);
-        $this->assertEquals(['tag_1', 'tag_2'], $tags->raw());
+        self::assertInstanceOf(Tags::class, $tags);
+        self::assertEquals(['tag_1', 'tag_2'], $tags->raw());
     }
 }

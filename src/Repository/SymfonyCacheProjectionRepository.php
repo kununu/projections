@@ -19,7 +19,7 @@ final class SymfonyCacheProjectionRepository extends AbstractProjectionRepositor
 
     public function deleteByTags(Tags $tags): void
     {
-        if (!$this->cachePool->invalidateTags($tags->raw())) {
+        if (!$this->getCachePool()->invalidateTags($tags->raw())) {
             throw new ProjectionException('Not possible to delete projection items on cache pool based on tag');
         }
     }
@@ -30,5 +30,12 @@ final class SymfonyCacheProjectionRepository extends AbstractProjectionRepositor
         $cacheItem->tag($item->getTags()->raw());
 
         return $cacheItem;
+    }
+
+    private function getCachePool(): TagAwareAdapterInterface
+    {
+        assert($this->cachePool instanceof TagAwareAdapterInterface);
+
+        return $this->cachePool;
     }
 }

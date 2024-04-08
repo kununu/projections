@@ -6,7 +6,8 @@ namespace Kununu\Projections\TestCase\Provider;
 use Kununu\Projections\ProjectionItemIterableInterface;
 use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Provider\AbstractCachedProvider;
-use PHPUnit\Framework\MockObject\Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -18,9 +19,9 @@ abstract class AbstractCachedProviderTestCase extends TestCase
     protected MockObject|ProjectionRepositoryInterface|null $projectionRepository = null;
     protected MockObject|LoggerInterface|null $logger = null;
 
-    /** @dataProvider getAndCacheDataDataProvider */
+    #[DataProvider('getAndCacheDataDataProvider')]
     public function testGetAndCacheData(
-        $originalProvider,
+        mixed $originalProvider,
         string $method,
         array $args,
         ProjectionItemIterableInterface $item,
@@ -31,7 +32,7 @@ abstract class AbstractCachedProviderTestCase extends TestCase
     ): void {
         // Get from cache
         ($repository = $this->getProjectionRepository())
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('get')
             ->with($item)
             ->willReturn($projectedItem);
@@ -46,19 +47,19 @@ abstract class AbstractCachedProviderTestCase extends TestCase
             if ($expectedResult && $itemToProject) {
                 // Add data to the cache
                 $repository
-                    ->expects($this->once())
+                    ->expects(self::once())
                     ->method('add')
                     ->with($itemToProject);
             } else {
                 $repository
-                    ->expects($this->never())
+                    ->expects(self::never())
                     ->method('add');
             }
         }
 
         $result = call_user_func_array([$this->getProvider($originalProvider), $method], $args);
 
-        $this->assertEquals($expectedResult, $result);
+        self::assertEquals($expectedResult, $result);
     }
 
     public static function getAndCacheDataDataProvider(): array
@@ -84,15 +85,11 @@ abstract class AbstractCachedProviderTestCase extends TestCase
         bool $expected,
         ?iterable $data
     ): MockObject {
-        $provider = (new Generator())
-            ->getMock(
-                type: $providerClass,
-                methods: [$method],
-                callOriginalConstructor: false,
-                callOriginalClone: false,
-                cloneArguments: false,
-                allowMockingUnknownTypes: false,
-            );
+        $provider = (new MockBuilder(new static(sprintf('%s::%s', $providerClass, $method)), $providerClass))
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->onlyMethods([$method])
+            ->getMock();
 
         $invocationMocker = $provider
             ->expects($expected ? self::once() : self::never())

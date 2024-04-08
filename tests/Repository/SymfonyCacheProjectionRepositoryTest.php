@@ -3,21 +3,23 @@ declare(strict_types=1);
 
 namespace Kununu\Projections\Tests\Repository;
 
+use Closure;
 use Kununu\Projections\Exception\ProjectionException;
 use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Repository\SymfonyCacheProjectionRepository;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
-use Kununu\Projections\Tests\Stubs\CacheItem\CacheItemStub;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
+use Symfony\Component\Cache\CacheItem;
 
 final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepositoryTestCase
 {
     public function testDeleteByTags(): void
     {
-        $this->cachePool
-            ->expects($this->once())
+        $this->getCachePool()
+            ->expects(self::once())
             ->method('invalidateTags')
             ->with(['tag_1', 'tag_2'])
             ->willReturn(true);
@@ -30,27 +32,27 @@ final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepos
         $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to delete projection items on cache pool based on tag');
 
-        $this->cachePool
-            ->expects($this->once())
+        $this->getCachePool()
+            ->expects(self::once())
             ->method('invalidateTags')
             ->willReturn(false);
 
         $this->getProjectionRepository()->deleteByTags(new Tags());
     }
 
-    protected function extraAssertionsForAdd(CacheItemStub $cacheItemStub): void
+    protected function extraAssertionsForAdd(CacheItemInterface $cacheItem): void
     {
-        $this->assertTags($cacheItemStub);
+        $this->assertTags($cacheItem);
     }
 
-    protected function extraAssertionsForAddIterable(CacheItemStub $cacheItemStub): void
+    protected function extraAssertionsForAddIterable(CacheItemInterface $cacheItem): void
     {
-        $this->assertTags($cacheItemStub);
+        $this->assertTags($cacheItem);
     }
 
-    protected function extraAssertionsForAddDeferred(CacheItemStub $cacheItemStub): void
+    protected function extraAssertionsForAddDeferred(CacheItemInterface $cacheItem): void
     {
-        $this->assertTags($cacheItemStub);
+        $this->assertTags($cacheItem);
     }
 
     protected function getCachePool(): MockObject|TagAwareAdapterInterface
@@ -67,8 +69,40 @@ final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepos
         return new SymfonyCacheProjectionRepository($this->getCachePool(), $this->serializer);
     }
 
-    private function assertTags(CacheItemStub $cacheItemStub): void
+    /**
+     * In symfony/cache 6.4, AdapterInterface is defined to return a concrete implementation of CacheItemInterface,
+     * so we need an adapter from to create a Symfony CacheItem instance from CacheItemStub.
+     */
+    protected function adaptCacheItem(CacheItemInterface $cacheItem): CacheItem
     {
-        $this->assertEquals(['test', 'kununu', 'id_item'], $cacheItemStub->getTags());
+        // Since the properties are protected we need to bind it to this closure to be able to set them.
+        $item = Closure::bind(
+            static function(string $key, mixed $value, bool $isHit): CacheItem {
+                $item = new CacheItem();
+                $item->key = $key;
+                $item->value = $value;
+                $item->isHit = $isHit;
+                $item->isTaggable = true;
+
+                return $item;
+            },
+            null,
+            CacheItem::class
+        );
+
+        return $item($cacheItem->getKey(), $cacheItem->get(), $cacheItem->isHit());
+    }
+
+    private function assertTags(CacheItemInterface $cacheItem): void
+    {
+        self::assertInstanceOf(CacheItem::class, $cacheItem);
+
+        // CacheItem::getMetadata returns the metadata (where the tags are stored).
+        //
+        // Since the values are only updated when the cache adapter commits, we need to get the "newMetadata"
+        // property. That is protected, so let's bypass protection rules and get the property value
+        $tags = (Closure::bind(fn(): array => array_keys($this->newMetadata['tags'] ?? []), $cacheItem, $cacheItem))();
+
+        self::assertEquals(['test', 'kununu', 'id_item'], $tags);
     }
 }

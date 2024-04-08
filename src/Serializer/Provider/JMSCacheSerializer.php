@@ -10,7 +10,7 @@ final class JMSCacheSerializer implements CacheSerializerInterface
 {
     private const SERIALIZER_FORMAT = 'json';
 
-    public function __construct(private SerializerInterface $serializer)
+    public function __construct(private readonly SerializerInterface $serializer)
     {
     }
 

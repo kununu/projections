@@ -11,9 +11,9 @@ use Psr\Log\LogLevel;
 abstract class AbstractCacheCleanerByTags implements CacheCleanerInterface
 {
     public function __construct(
-        private ProjectionRepositoryInterface $projectionRepository,
-        private LoggerInterface $logger,
-        private string $logLevel = LogLevel::INFO
+        private readonly ProjectionRepositoryInterface $projectionRepository,
+        private readonly LoggerInterface $logger,
+        private readonly string $logLevel = LogLevel::INFO
     ) {
     }
 

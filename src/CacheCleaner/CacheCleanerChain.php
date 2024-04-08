@@ -5,7 +5,8 @@ namespace Kununu\Projections\CacheCleaner;
 
 final class CacheCleanerChain implements CacheCleanerInterface
 {
-    private array $cacheCleaners;
+    /** @var CacheCleanerInterface[] */
+    private readonly array $cacheCleaners;
 
     public function __construct(CacheCleanerInterface ...$cacheCleaners)
     {

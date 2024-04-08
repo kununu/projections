@@ -5,13 +5,11 @@ namespace Kununu\Projections\Tag;
 
 final class Tags
 {
-    private array $tags = [];
+    private readonly array $tags;
 
     public function __construct(Tag ...$tags)
     {
-        foreach ($tags as $tag) {
-            $this->add($tag);
-        }
+        $this->tags = $this->createTags(...$tags);
     }
 
     public function raw(): array
@@ -19,14 +17,16 @@ final class Tags
         return array_keys($this->tags);
     }
 
-    private function add(Tag $tag): void
+    private function createTags(Tag ...$tags): array
     {
-        $value = $tag->value();
-
-        if (isset($this->tags[$value])) {
-            return;
+        $values = [];
+        foreach ($tags as $tag) {
+            if (isset($values[$tag->tag])) {
+                continue;
+            }
+            $values[$tag->tag] = true;
         }
 
-        $this->tags[$value] = true;
+        return $values;
     }
 }

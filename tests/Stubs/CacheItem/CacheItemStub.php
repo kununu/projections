@@ -13,7 +13,7 @@ final class CacheItemStub implements CacheItemInterface
     private bool $isHit = false;
     private array $tags = [];
 
-    public function __construct(private string $key)
+    public function __construct(private readonly string $key)
     {
     }
 
@@ -32,38 +32,38 @@ final class CacheItemStub implements CacheItemInterface
         return $this->isHit;
     }
 
-    public function set(mixed $value): CacheItemStub
+    public function set(mixed $value): static
     {
         $this->value = $value;
 
         return $this;
     }
 
-    public function setHit(): CacheItemInterface
+    public function setHit(): CacheItemStub
     {
         $this->isHit = true;
 
         return $this;
     }
 
-    public function setNotHit(): CacheItemInterface
+    public function setNotHit(): CacheItemStub
     {
         $this->isHit = false;
 
         return $this;
     }
 
-    public function expiresAt(?DateTimeInterface $expiration): CacheItemInterface
+    public function expiresAt(?DateTimeInterface $expiration): static
     {
         return $this;
     }
 
-    public function expiresAfter(DateInterval|int|null $time): CacheItemInterface
+    public function expiresAfter(DateInterval|int|null $time): static
     {
         return $this;
     }
 
-    public function tag(array $tags): CacheItemInterface
+    public function tag(array $tags): CacheItemStub
     {
         $this->tags = $tags;
 
