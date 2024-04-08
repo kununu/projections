@@ -42,6 +42,11 @@ protected function getAndCacheData(
 An example:
 
 ```php
+<?php
+declare(strict_types=1);
+
+namespace Kununu\Example;
+
 use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\ProjectionItemIterableInterface;
 

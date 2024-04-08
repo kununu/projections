@@ -14,8 +14,8 @@ use Psr\Cache\CacheItemPoolInterface;
 abstract class AbstractProjectionRepository implements ProjectionRepositoryInterface
 {
     public function __construct(
-        protected CacheItemPoolInterface $cachePool,
-        protected CacheSerializerInterface $serializer
+        protected readonly CacheItemPoolInterface $cachePool,
+        protected readonly CacheSerializerInterface $serializer
     ) {
     }
 
@@ -48,11 +48,11 @@ abstract class AbstractProjectionRepository implements ProjectionRepositoryInter
     {
         $cacheItem = $this->cachePool->getItem($item->getKey());
 
-        if (!$cacheItem->isHit()) {
-            return null;
+        if ($cacheItem->isHit()) {
+            return $this->serializer->deserialize($cacheItem->get(), $item::class);
         }
 
-        return $this->serializer->deserialize($cacheItem->get(), $item::class);
+        return null;
     }
 
     public function delete(ProjectionItemInterface $item): void

@@ -95,7 +95,7 @@ final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
         $provider = $this->getProvider(new ProviderStub());
 
         $this->getLogger()
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('log')
             ->with(
                 LogLevel::INFO,
@@ -104,7 +104,7 @@ final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
             );
 
         $this->getProjectionRepository()
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with(new ProjectionItemIterableStub(self::ID_1));
 
@@ -122,7 +122,7 @@ final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
             data: self::DATA
         );
 
-        $this->assertEquals(self::DATA, $externalProvider->getData(self::ID_1));
+        self::assertEquals(self::DATA, $externalProvider->getData(self::ID_1));
     }
 
     public function testCreateExternalProviderNotReturningData(): void
@@ -138,14 +138,17 @@ final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
 
         $this->expectException(ExpectationFailedException::class);
 
-        $this->assertNull($externalProvider->getData(self::ID_1));
+        self::assertNull($externalProvider->getData(self::ID_1));
     }
 
     public function testGetAndCacheDataDataProvider(): void
     {
-        $keys = array_map(fn($key) => sprintf('getData_%s', $key), array_keys(self::getDataDataProvider()));
+        $keys = array_map(
+            static fn($key): string => sprintf('getData_%s', $key),
+            array_keys(self::getDataDataProvider())
+        );
 
-        $this->assertEquals(array_combine($keys, self::getDataDataProvider()), self::getAndCacheDataDataProvider());
+        self::assertEquals(array_combine($keys, self::getDataDataProvider()), self::getAndCacheDataDataProvider());
     }
 
     protected function getProvider(mixed $originalProvider): CachedProviderStub

@@ -16,6 +16,9 @@ interface ProjectionItemInterface
 Here's an example of projection item:
 
 ```php
+<?php
+declare(strict_types=1);
+
 namespace Kununu\Example;
 
 use Kununu\Projections\ProjectionItemInterface;
@@ -25,7 +28,7 @@ final class ExampleProjectionItem implements ProjectionItemInterface
 {
     use ProjectionTagGenerator;
 
-    public function __construct(private string $id, private string $someValue)
+    public function __construct(private readonly string $id, private readonly string $someValue)
     {
     }
 

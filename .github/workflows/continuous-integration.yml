@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 8.0
+          - 8.1
         dependencies:
           - highest
 
@@ -32,7 +32,7 @@ jobs:
           coverage: xdebug
 
       - name: Install Composer Dependencies
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v3
         with:
           dependency-versions: ${{ matrix.dependencies }}
           composer-options: "--prefer-stable"
@@ -57,7 +57,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: build-8-highest-coverage
+          name: build-8.1-highest-coverage
           path: tests/.results/
 
       - name: Fix Code Coverage Paths

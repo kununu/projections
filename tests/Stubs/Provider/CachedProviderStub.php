@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 final class CachedProviderStub extends AbstractCachedProvider implements ProviderStubInterface
 {
     public function __construct(
-        private ProviderStubInterface $provider,
+        private readonly ProviderStubInterface $provider,
         ProjectionRepositoryInterface $projectionRepository,
         LoggerInterface $logger
     ) {

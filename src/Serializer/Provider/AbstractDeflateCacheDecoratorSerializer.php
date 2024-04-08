@@ -7,7 +7,7 @@ use Kununu\Projections\Serializer\CacheSerializerInterface;
 
 abstract class AbstractDeflateCacheDecoratorSerializer implements CacheSerializerInterface
 {
-    public function __construct(private CacheSerializerInterface $serializer)
+    public function __construct(private readonly CacheSerializerInterface $serializer)
     {
     }
 

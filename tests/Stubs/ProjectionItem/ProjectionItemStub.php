@@ -11,7 +11,7 @@ final class ProjectionItemStub implements ProjectionItemInterface
 {
     private const PROJECTION_KEY = 'test_%s';
 
-    public function __construct(private string $id)
+    public function __construct(private readonly string $id)
     {
     }
 

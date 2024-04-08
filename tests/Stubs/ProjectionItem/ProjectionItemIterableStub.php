@@ -15,18 +15,8 @@ final class ProjectionItemIterableStub implements ProjectionItemIterableInterfac
 
     private const PROJECTION_KEY = 'test_iterable_%s';
 
-    public function __construct(private string $id, private ?string $stuff = null)
+    public function __construct(public readonly string $id, public readonly ?string $stuff = null)
     {
-    }
-
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    public function stuff(): string
-    {
-        return $this->stuff;
     }
 
     public function getKey(): string

@@ -13,14 +13,14 @@ final class TagsTest extends TestCase
     {
         $tags = new Tags();
 
-        $this->assertCount(0, $tags->raw());
+        self::assertEmpty($tags->raw());
     }
 
     public function testThatCanBeCreatedWithTags(): void
     {
         $tags = new Tags(new Tag('tag_1'), new Tag('tag_2'));
 
-        $this->assertCount(2, $tags->raw());
+        self::assertCount(2, $tags->raw());
     }
 
     public function testUniquenessOfTags(): void
@@ -33,14 +33,14 @@ final class TagsTest extends TestCase
             new Tag('tag_2')
         );
 
-        $this->assertCount(3, $tags->raw());
+        self::assertCount(3, $tags->raw());
     }
 
     public function testThatRawReturnsAllTagsAsAnArray(): void
     {
         $tags = new Tags(new Tag('tag_1'), new Tag('tag_2'), new Tag('tag_3'));
 
-        $this->assertEquals(
+        self::assertEquals(
             ['tag_1', 'tag_2', 'tag_3'],
             $tags->raw()
         );

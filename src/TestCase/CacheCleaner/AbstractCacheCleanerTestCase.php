@@ -25,13 +25,13 @@ abstract class AbstractCacheCleanerTestCase extends TestCase
     public function testCacheCleaner(): void
     {
         $this->cachePool
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('invalidateTags')
             ->with(static::TAGS)
             ->willReturn(true);
 
         $this->logger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('log')
             ->with(
                 LogLevel::INFO,
@@ -45,13 +45,13 @@ abstract class AbstractCacheCleanerTestCase extends TestCase
     public function testCacheCleanerFail(): void
     {
         $this->cachePool
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('invalidateTags')
             ->with(static::TAGS)
             ->willReturn(false);
 
         $this->logger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('log')
             ->with(
                 LogLevel::INFO,

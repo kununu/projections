@@ -12,15 +12,15 @@ final class TagTest extends TestCase
     {
         $tag = new Tag('tag');
 
-        $this->assertInstanceOf(Tag::class, $tag);
-        $this->assertEquals('tag', $tag->value());
+        self::assertInstanceOf(Tag::class, $tag);
+        self::assertEquals('tag', $tag->tag);
     }
 
     public function testThatTagCanBeTreatedAsString(): void
     {
         $tag = new Tag('tag');
 
-        $this->assertEquals('tag', (string) $tag);
+        self::assertEquals('tag', (string) $tag);
     }
 
     public function testThatWhenTwoTagsHaveTheSameValueThenTheyAreEqual(): void
@@ -28,6 +28,16 @@ final class TagTest extends TestCase
         $tag1 = new Tag('tag');
         $tag2 = new Tag('tag');
 
-        $this->assertTrue($tag2->equals($tag1));
+        self::assertTrue($tag1->equals($tag2));
+        self::assertTrue($tag2->equals($tag1));
+    }
+
+    public function testThatWhenTwoTagsHaveDistinctValuesThenTheyAreDifferent(): void
+    {
+        $tag1 = new Tag('tag_1');
+        $tag2 = new Tag('tag_2');
+
+        self::assertFalse($tag1->equals($tag2));
+        self::assertFalse($tag2->equals($tag1));
     }
 }

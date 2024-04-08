@@ -30,7 +30,7 @@ final class ProjectionItemIterableTraitTest extends TestCase
 
         $validClass->storeData([1, 2, 3]);
 
-        $this->assertEquals([1, 2, 3], $validClass->data());
+        self::assertEquals([1, 2, 3], $validClass->data());
 
         $iterator = new ArrayIterator();
         $iterator->append('a');
@@ -38,7 +38,7 @@ final class ProjectionItemIterableTraitTest extends TestCase
         $iterator->append(5);
         $validClass->storeData($iterator);
 
-        $this->assertEquals(['a', 'b', 5], $validClass->data());
+        self::assertEquals(['a', 'b', 5], $validClass->data());
 
         $invalidClass = new class() {
             use ProjectionItemIterableTrait;

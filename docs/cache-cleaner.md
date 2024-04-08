@@ -27,9 +27,9 @@ So your cache cleaner class by tags should be instantiated with a `ProjectionRep
 
 ```php
 public function __construct(
-    private ProjectionRepositoryInterface $projectionRepository,
-    private LoggerInterface $logger,
-    private string $logLevel = LogLevel::INFO
+    private readonly ProjectionRepositoryInterface $projectionRepository,
+    private readonly LoggerInterface $logger,
+    private readonly string $logLevel = LogLevel::INFO
 );
 
 abstract protected function getTags(): Tags;
@@ -38,6 +38,11 @@ abstract protected function getTags(): Tags;
 Example:
 
 ```php
+<?php
+declare(strict_types=1);
+
+namespace Kununu\Example;
+
 use Kununu\Projections\CacheCleaner\CacheCleanerInterface;
 use Kununu\Projections\CacheCleaner\AbstractCacheCleanerByTags;
 
@@ -54,7 +59,7 @@ final class MyCacheCleaner extends AbstractCacheCleanerByTags
 
 final class MyClass
 {
-    public function __construct(private CacheCleanerInterface $cacheCleaner)
+    public function __construct(private readonly CacheCleanerInterface $cacheCleaner)
     {
     }
 
@@ -81,14 +86,20 @@ Just make you test class extend it and override the `TAGS` constant and implemen
 Example:
 
 ```php
+<?php
+declare(strict_types=1);
+
+namespace Kununu\Example;
+
 use Kununu\Projections\ProjectionRepositoryInterface;
+use Kununu\Projections\TestCase\CacheCleaner\AbstractCacheCleanerTestCase;
 use Psr\Log\LoggerInterface;
 
 final class MyCacheCleanerTest extends AbstractCacheCleanerTestCase
 {
     protected const TAGS = ['my-tag1', 'my-tag2'];
 
-    abstract protected function getCacheCleaner(
+    protected function getCacheCleaner(
         ProjectionRepositoryInterface $projectionRepository,
         LoggerInterface $logger
     ): CacheCleanerInterface {
@@ -103,6 +114,13 @@ The `TAGS` constant must be the tags that you expect that your cache cleaner cla
 For the example above we are expecting that `MyCacheCleaner::getTags` will return a `Tags` collection with the same tags defined in the constant, e.g.:
 
 ```php
+<?php
+declare(strict_types=1);
+
+namespace Kununu\Example
+
+use Kununu\Projections\CacheCleaner\AbstractCacheCleanerByTags;
+
 final class MyCacheCleaner extends AbstractCacheCleanerByTags
 {
     protected function getTags(): Tags
@@ -121,11 +139,15 @@ This class is constructed by passing the desired instances of your classes that 
 Example:
 
 ```php
+<?php
+declare(strict_types=1);
+
+namespace Kununu\Example
+
 use Kununu\Projections\CacheCleaner\CacheCleanerInterface;
 use Kununu\Projections\CacheCleaner\AbstractCacheCleanerByTags;
 
 // Continuing our example, let's add more cache cleaners...
-
 final class MySecondCacheCleaner extends AbstractCacheCleanerByTags
 {
     protected function getTags(): Tags

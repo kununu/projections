@@ -1,6 +1,7 @@
-.idea
-tests/.results
-vendor
-composer.lock
+.idea/
 .php_cs.cache
+composer.lock
 .phpunit.result.cache
+.phpunit.cache
+vendor/
+tests/.results/

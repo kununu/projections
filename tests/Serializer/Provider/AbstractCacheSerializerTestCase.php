@@ -19,14 +19,14 @@ abstract class AbstractCacheSerializerTestCase extends TestCase
     {
         $result = $this->serializer->serialize($this->item);
 
-        $this->assertEquals($this->serializedResult, $result);
+        self::assertEquals($this->serializedResult, $result);
     }
 
     public function testDeserialize(): void
     {
         $result = $this->serializer->deserialize($this->serializedResult, ProjectionItemIterableStub::class);
 
-        $this->assertEquals($result, $this->item);
+        self::assertEquals($result, $this->item);
     }
 
     abstract protected function getSerializer(): CacheSerializerInterface;

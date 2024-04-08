@@ -15,9 +15,9 @@ abstract class AbstractCachedProvider
     private const DATA_KEY = 'data';
 
     public function __construct(
-        private ProjectionRepositoryInterface $projectionRepository,
-        private LoggerInterface $logger,
-        private string $logLevel = LogLevel::INFO
+        private readonly ProjectionRepositoryInterface $projectionRepository,
+        private readonly LoggerInterface $logger,
+        private readonly string $logLevel = LogLevel::INFO
     ) {
     }
 
@@ -83,7 +83,7 @@ abstract class AbstractCachedProvider
 
     private function log(string $message, string $cacheKey, mixed $data = null): void
     {
-        $this->logger()
+        $this->logger
             ->log(
                 $this->logLevel,
                 $message,

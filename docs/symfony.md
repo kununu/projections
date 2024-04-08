@@ -111,6 +111,9 @@ Kununu\Example\MyProvider:
 And inside the respective class we should depend only on the `ProjectionRepositoryInterface` interface instance to project/get/delete data from the cache.
 
 ```php
+<?php
+declare(strict_types=1);
+
 namespace Kununu\Example;
 
 use Kununu\Projections\ProjectionRepositoryInterface;
@@ -119,7 +122,7 @@ use Kununu\Projections\Tag\Tags;
 
 final class MyProvider
 {
-    public function __construct(private ProjectionRepositoryInterface $projectionRepository)
+    public function __construct(private readonly ProjectionRepositoryInterface $projectionRepository)
     {
     }
 
