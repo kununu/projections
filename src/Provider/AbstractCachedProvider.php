@@ -83,7 +83,7 @@ abstract class AbstractCachedProvider
 
     private function log(string $message, string $cacheKey, mixed $data = null): void
     {
-        $this->logger
+        $this->logger()
             ->log(
                 $this->logLevel,
                 $message,
