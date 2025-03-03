@@ -56,7 +56,7 @@ final class SimpleCachedProviderTestTraitTest extends TestCase
                 'expected'        => self::RESULT,
                 'originalResult'  => null,
             ],
-            'cache_miss_return_schema' => [
+            'cache_miss_return_result' => [
                 'expectCacheMiss' => true,
                 'expected'        => self::RESULT,
                 'originalResult'  => self::RESULT,
