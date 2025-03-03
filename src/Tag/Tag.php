@@ -5,9 +5,9 @@ namespace Kununu\Projections\Tag;
 
 use Stringable;
 
-final class Tag implements Stringable
+final readonly class Tag implements Stringable
 {
-    public function __construct(public readonly string $tag)
+    public function __construct(public string $tag)
     {
     }
 

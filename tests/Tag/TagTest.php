@@ -12,7 +12,6 @@ final class TagTest extends TestCase
     {
         $tag = new Tag('tag');
 
-        self::assertInstanceOf(Tag::class, $tag);
         self::assertEquals('tag', $tag->tag);
     }
 

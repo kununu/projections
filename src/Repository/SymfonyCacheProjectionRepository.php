@@ -9,6 +9,7 @@ use Kununu\Projections\Serializer\CacheSerializerInterface;
 use Kununu\Projections\Tag\Tags;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
+use Symfony\Component\Cache\CacheItem;
 
 final class SymfonyCacheProjectionRepository extends AbstractProjectionRepository
 {
@@ -26,7 +27,7 @@ final class SymfonyCacheProjectionRepository extends AbstractProjectionRepositor
 
     protected function createCacheItem(ProjectionItemInterface $item): CacheItemInterface
     {
-        $cacheItem = parent::createCacheItem($item);
+        $cacheItem = $this->convertCacheItem(parent::createCacheItem($item));
         $cacheItem->tag($item->getTags()->raw());
 
         return $cacheItem;
@@ -37,5 +38,12 @@ final class SymfonyCacheProjectionRepository extends AbstractProjectionRepositor
         assert($this->cachePool instanceof TagAwareAdapterInterface);
 
         return $this->cachePool;
+    }
+
+    private function convertCacheItem(CacheItemInterface $cacheItem): CacheItem
+    {
+        assert($cacheItem instanceof CacheItem);
+
+        return $cacheItem;
     }
 }

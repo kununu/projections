@@ -97,7 +97,7 @@ use Psr\Log\LoggerInterface;
 
 final class MyCacheCleanerTest extends AbstractCacheCleanerTestCase
 {
-    protected const TAGS = ['my-tag1', 'my-tag2'];
+    protected const array TAGS = ['my-tag1', 'my-tag2'];
 
     protected function getCacheCleaner(
         ProjectionRepositoryInterface $projectionRepository,
@@ -179,3 +179,7 @@ $myClass = new MyClass($cacheCleaner);
 // When I call `myMethod` it will clear all the caches as defined on each cleaner injected into the chain $cacheCleaner
 $myClass->myMethod();
 ```
+
+---
+
+[Back to Index](../README.md)

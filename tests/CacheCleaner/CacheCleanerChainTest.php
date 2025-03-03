@@ -25,7 +25,7 @@ final class CacheCleanerChainTest extends TestCase
         $cleaner = $this->createMock(CacheCleanerInterface::class);
 
         $cleaner
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('clear');
 
         return $cleaner;

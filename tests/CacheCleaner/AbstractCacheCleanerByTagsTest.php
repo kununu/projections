@@ -13,11 +13,11 @@ use Psr\Log\LoggerInterface;
 
 final class AbstractCacheCleanerByTagsTest extends AbstractCacheCleanerTestCase
 {
-    protected const TAGS = ['my-tag1', 'my-tag2'];
+    protected const array TAGS = ['my-tag1', 'my-tag2'];
 
     protected function getCacheCleaner(
         ProjectionRepositoryInterface $projectionRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ): CacheCleanerInterface {
         return new class($projectionRepository, $logger) extends AbstractCacheCleanerByTags {
             use ProjectionTagGenerator;

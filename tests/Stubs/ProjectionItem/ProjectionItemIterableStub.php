@@ -13,7 +13,7 @@ final class ProjectionItemIterableStub implements ProjectionItemIterableInterfac
     use ProjectionItemIterableTrait;
     use ProjectionTagGenerator;
 
-    private const PROJECTION_KEY = 'test_iterable_%s';
+    private const string PROJECTION_KEY = 'test_iterable_%s';
 
     public function __construct(public readonly string $id, public readonly ?string $stuff = null)
     {

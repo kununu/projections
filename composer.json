@@ -20,14 +20,17 @@
     }
   ],
   "require": {
-    "php": ">=8.1"
+    "php": ">=8.3"
   },
   "require-dev": {
     "ext-json": "*",
     "ext-igbinary": "*",
     "ext-zlib": "*",
-    "phpunit/phpunit": "^10.5",
-    "kununu/scripts": ">=4.0",
+    "kununu/scripts": ">=5.1",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-phpunit": "^2.0",
+    "phpunit/phpunit": "^11.5",
+    "rector/rector": "^2.0",
     "symfony/yaml": "^6.4",
     "symfony/cache": "^6.4",
     "jms/serializer": "^3.28",
@@ -54,11 +57,15 @@
   },
   "scripts": {
     "test": "phpunit --no-coverage --no-logging --no-progress",
-    "test-coverage": "XDEBUG_MODE=coverage phpunit"
+    "test-coverage": "XDEBUG_MODE=coverage phpunit",
+    "rector": "rector process --dry-run --config rector-ci.php src/ tests/",
+    "phpstan": "phpstan"
   },
   "scripts-descriptions": {
     "test": "Run all tests",
-    "test-coverage": "Run all tests with coverage report"
+    "test-coverage": "Run all tests with coverage report",
+    "rector": "Run Rector in dry-run mode with CI rules",
+    "phpstan": "Run PHPStan"
   },
   "config": {
     "allow-plugins": {

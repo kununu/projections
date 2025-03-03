@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Kununu\Projections\Tests\Tag;
 
 use Kununu\Projections\Tag\ProjectionTagGenerator;
-use Kununu\Projections\Tag\Tags;
 use PHPUnit\Framework\TestCase;
 
 final class ProjectionTagGeneratorTest extends TestCase
@@ -13,9 +12,8 @@ final class ProjectionTagGeneratorTest extends TestCase
 
     public function testCreateTagsFromArray(): void
     {
-        $tags = $this::createTagsFromArray('tag_1', 'tag_2');
+        $tags = $this::createTagsFromArray('tag_1', 'tag_2', 'tag_1');
 
-        self::assertInstanceOf(Tags::class, $tags);
         self::assertEquals(['tag_1', 'tag_2'], $tags->raw());
     }
 }

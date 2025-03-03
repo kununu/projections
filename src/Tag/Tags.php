@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Kununu\Projections\Tag;
 
-final class Tags
+final readonly class Tags
 {
-    private readonly array $tags;
+    /** @var array<Tag> */
+    private array $tags;
 
     public function __construct(Tag ...$tags)
     {

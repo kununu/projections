@@ -6,11 +6,11 @@ namespace Kununu\Projections\Serializer\Provider;
 use JMS\Serializer\SerializerInterface;
 use Kununu\Projections\Serializer\CacheSerializerInterface;
 
-final class JMSCacheSerializer implements CacheSerializerInterface
+final readonly class JMSCacheSerializer implements CacheSerializerInterface
 {
-    private const SERIALIZER_FORMAT = 'json';
+    private const string SERIALIZER_FORMAT = 'json';
 
-    public function __construct(private readonly SerializerInterface $serializer)
+    public function __construct(private SerializerInterface $serializer)
     {
     }
 

@@ -14,7 +14,7 @@ final class CachedProviderStub extends AbstractCachedProvider implements Provide
     public function __construct(
         private readonly ProviderStubInterface $provider,
         ProjectionRepositoryInterface $projectionRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         parent::__construct($projectionRepository, $logger);
     }

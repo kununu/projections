@@ -8,7 +8,7 @@ use Kununu\Projections\Serializer\Provider\SymfonyCacheSerializer;
 
 final class SymfonyCacheSerializerTest extends AbstractSymfonySerializerTestCase
 {
-    protected const RESULT_FILE = 'symfony.result';
+    protected const string RESULT_FILE = 'symfony.result';
 
     protected function getSerializer(): CacheSerializerInterface
     {

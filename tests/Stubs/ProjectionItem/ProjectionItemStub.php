@@ -7,11 +7,11 @@ use Kununu\Projections\ProjectionItemInterface;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
 
-final class ProjectionItemStub implements ProjectionItemInterface
+final readonly class ProjectionItemStub implements ProjectionItemInterface
 {
-    private const PROJECTION_KEY = 'test_%s';
+    private const string PROJECTION_KEY = 'test_%s';
 
-    public function __construct(private readonly string $id)
+    public function __construct(private string $id)
     {
     }
 

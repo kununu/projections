@@ -16,22 +16,22 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 
 abstract class AbstractCacheCleanerTestCase extends TestCase
 {
-    protected const TAGS = [];
+    protected const array TAGS = [];
 
-    protected MockObject|TagAwareAdapterInterface $cachePool;
-    protected MockObject|LoggerInterface $logger;
+    protected MockObject&TagAwareAdapterInterface $cachePool;
+    protected MockObject&LoggerInterface $logger;
     protected CacheCleanerInterface $cacheCleaner;
 
     public function testCacheCleaner(): void
     {
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('invalidateTags')
             ->with(static::TAGS)
             ->willReturn(true);
 
         $this->logger
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('log')
             ->with(
                 LogLevel::INFO,
@@ -45,13 +45,13 @@ abstract class AbstractCacheCleanerTestCase extends TestCase
     public function testCacheCleanerFail(): void
     {
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('invalidateTags')
             ->with(static::TAGS)
             ->willReturn(false);
 
         $this->logger
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('log')
             ->with(
                 LogLevel::INFO,
@@ -67,7 +67,7 @@ abstract class AbstractCacheCleanerTestCase extends TestCase
 
     abstract protected function getCacheCleaner(
         ProjectionRepositoryInterface $projectionRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ): CacheCleanerInterface;
 
     protected function setUp(): void

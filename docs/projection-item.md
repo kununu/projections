@@ -72,3 +72,7 @@ interface ProjectionItemIterableInterface extends ProjectionItemInterface
 A trait called `ProjectionItemIterableTrait` is provided with those methods already implemented and with the data stored as an array, so just use it your projection item classes, and you're good to go.
 
 Just bear in mind that the trait is only implementing the methods defined in `ProjectionItemIterableInterface` and not those of `ProjectionItemInterface` so it is still responsibility of your projection item class to implement them!
+
+---
+
+[Back to Index](../README.md)

@@ -10,14 +10,14 @@ use Psr\Log\LogLevel;
 
 abstract class AbstractCachedProvider
 {
-    private const CACHE_KEY = 'cache_key';
-    private const CLASS_KEY = 'class';
-    private const DATA_KEY = 'data';
+    private const string CACHE_KEY = 'cache_key';
+    private const string CLASS_KEY = 'class';
+    private const string DATA_KEY = 'data';
 
     public function __construct(
         private readonly ProjectionRepositoryInterface $projectionRepository,
         private readonly LoggerInterface $logger,
-        private readonly string $logLevel = LogLevel::INFO
+        private readonly string $logLevel = LogLevel::INFO,
     ) {
     }
 
@@ -29,7 +29,7 @@ abstract class AbstractCachedProvider
     protected function getAndCacheData(
         ProjectionItemIterableInterface $item,
         callable $dataGetter,
-        callable ...$preProjections
+        callable ...$preProjections,
     ): ?iterable {
         $key = $item->getKey();
 

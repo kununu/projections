@@ -11,6 +11,7 @@ use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 
@@ -18,13 +19,13 @@ final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepos
 {
     public function testDeleteByTags(): void
     {
-        $this->getCachePool()
-            ->expects(self::once())
+        $this->cachePool
+            ->expects($this->once())
             ->method('invalidateTags')
             ->with(['tag_1', 'tag_2'])
             ->willReturn(true);
 
-        $this->getProjectionRepository()->deleteByTags(new Tags(new Tag('tag_1'), new Tag('tag_2')));
+        $this->projectionRepository->deleteByTags(new Tags(new Tag('tag_1'), new Tag('tag_2')));
     }
 
     public function testWhenDeleteByTagsFails(): void
@@ -32,30 +33,30 @@ final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepos
         $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to delete projection items on cache pool based on tag');
 
-        $this->getCachePool()
-            ->expects(self::once())
+        $this->cachePool
+            ->expects($this->once())
             ->method('invalidateTags')
             ->willReturn(false);
 
-        $this->getProjectionRepository()->deleteByTags(new Tags());
+        $this->projectionRepository->deleteByTags(new Tags());
     }
 
-    protected function extraAssertionsForAdd(CacheItemInterface $cacheItem): void
+    protected static function extraAssertionsForAdd(CacheItemInterface $cacheItem): void
     {
-        $this->assertTags($cacheItem);
+        self::assertTags($cacheItem);
     }
 
-    protected function extraAssertionsForAddIterable(CacheItemInterface $cacheItem): void
+    protected static function extraAssertionsForAddIterable(CacheItemInterface $cacheItem): void
     {
-        $this->assertTags($cacheItem);
+        self::assertTags($cacheItem);
     }
 
-    protected function extraAssertionsForAddDeferred(CacheItemInterface $cacheItem): void
+    protected static function extraAssertionsForAddDeferred(CacheItemInterface $cacheItem): void
     {
-        $this->assertTags($cacheItem);
+        self::assertTags($cacheItem);
     }
 
-    protected function getCachePool(): MockObject|TagAwareAdapterInterface
+    protected function getCachePool(): MockObject&CacheItemPoolInterface
     {
         if (null === $this->cachePool) {
             $this->cachePool = $this->createMock(TagAwareAdapterInterface::class);
@@ -66,7 +67,11 @@ final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepos
 
     protected function getProjectionRepository(): ProjectionRepositoryInterface
     {
-        return new SymfonyCacheProjectionRepository($this->getCachePool(), $this->serializer);
+        $cachePool = $this->getCachePool();
+
+        self::assertInstanceOf(TagAwareAdapterInterface::class, $cachePool);
+
+        return new SymfonyCacheProjectionRepository($cachePool, $this->serializer);
     }
 
     /**
@@ -93,7 +98,7 @@ final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepos
         return $item($cacheItem->getKey(), $cacheItem->get(), $cacheItem->isHit());
     }
 
-    private function assertTags(CacheItemInterface $cacheItem): void
+    private static function assertTags(CacheItemInterface $cacheItem): void
     {
         self::assertInstanceOf(CacheItem::class, $cacheItem);
 

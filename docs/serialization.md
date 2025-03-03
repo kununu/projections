@@ -58,7 +58,7 @@ $repository->add($myItem);
 
 ### PhpCacheSerializer
 
-This implementation is a wrapper for PHP's [internal serializer](https://www.php.net/manual/en/function.serialize.php) and [internal serializer](https://www.php.net/manual/en/function.unserialize).
+This implementation is a wrapper for PHP's [internal serializer](https://www.php.net/manual/en/function.serialize.php) and [internal un-serializer](https://www.php.net/manual/en/function.unserialize).
 
 ```php
 use Kununu\Projections\Repository\Psr6CacheProjectionRepository;
@@ -119,3 +119,6 @@ services:
     arguments: [ '@.inner' ]
 ```
 
+---
+
+[Back to Index](../README.md)

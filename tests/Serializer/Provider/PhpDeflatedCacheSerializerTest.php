@@ -8,7 +8,7 @@ use Kununu\Projections\Serializer\Provider\PhpDeflatedCacheSerializer;
 
 final class PhpDeflatedCacheSerializerTest extends AbstractCacheSerializerTestCase
 {
-    protected const RESULT_FILE = 'php-deflate.result';
+    protected const string RESULT_FILE = 'php-deflate.result';
 
     protected function getSerializer(): CacheSerializerInterface
     {
