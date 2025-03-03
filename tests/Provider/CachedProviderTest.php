@@ -11,7 +11,7 @@ use Kununu\Projections\Tests\Stubs\Provider\ProviderStubInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
-final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
+final class CachedProviderTest extends AbstractCachedProviderTestCase
 {
     protected const array METHODS = [
         self::METHOD_GET_DATA,

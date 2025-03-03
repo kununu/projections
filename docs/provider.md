@@ -275,6 +275,36 @@ public static function getCustomerDataDataProvider(): array
 }
 ```
 
+### SimpleCachedProviderTestTrait
+
+If you don't need the level of complexity provided by `AbstractCachedProviderTestCase` you can use the `SimpleCachedProviderTestTrait` trait instead.
+
+Just include the trait in your test class and in your test use the following method:
+
+```php
+private function configureCachedProvider(
+    MockObject&ProjectionRepositoryInterface $projectionRepository,
+    MockObject $originalProvider,
+    string $method,
+    bool $expectCacheMiss,
+    ProjectionItemInterface $searchItem,
+    ProjectionItemInterface $sourceItem,
+    mixed $originalResult,
+): void
+```
+
+- `$projectionRepository` - A mock instance of your projection repository
+- `$originalProvider`     - A mock instance of your original (non-cached) provider
+- `$method`               - The method on your provider you are configuring
+- `$expectCacheMiss`      - If you are expecting a cache miss or a cache hit
+- `$searchItem`           - The projection item instance used to search on the cache
+- `$sourceItem`           - The projection item instance that will be used to store data on the cache
+- `$originalResult`       - The original result returned from the non-cached provider that will be stored on the cache
+
+Example:
+
+See [SimpleCachedProviderTestTraitTest](../tests/Provider/SimpleCachedProviderTestTraitTest.php) for an example.
+
 ---
 
 [Back to Index](../README.md)
