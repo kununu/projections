@@ -9,7 +9,7 @@ use Kununu\Projections\Serializer\Provider\JMSDeflatedCacheSerializer;
 
 final class JMSDeflatedCacheSerializerTest extends AbstractCacheSerializerTestCase
 {
-    protected const RESULT_FILE = 'jms-deflate.result';
+    protected const string RESULT_FILE = 'jms-deflate.result';
 
     protected function getSerializer(): CacheSerializerInterface
     {

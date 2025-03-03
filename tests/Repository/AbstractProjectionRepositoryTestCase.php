@@ -16,39 +16,40 @@ use Psr\Cache\CacheItemPoolInterface;
 
 abstract class AbstractProjectionRepositoryTestCase extends TestCase
 {
-    private const ID = 'id_item';
-    private const KEY = 'test_id_item';
-    private const SERIALIZED = 'serialized_projection_item_dummy';
+    private const string ID = 'id_item';
+    private const string KEY = 'test_id_item';
+    private const string SERIALIZED = 'serialized_projection_item_dummy';
 
-    protected MockObject|CacheItemPoolInterface|null $cachePool = null;
-    protected MockObject|CacheSerializerInterface $serializer;
+    protected (MockObject&CacheItemPoolInterface)|null $cachePool = null;
+    protected MockObject&CacheSerializerInterface $serializer;
+    protected ProjectionRepositoryInterface $projectionRepository;
 
     public function testAdd(): void
     {
         $cacheItem = $this->adaptCacheItem(new CacheItemStub(self::ID));
         $item = new ProjectionItemStub(self::ID);
 
-        $this->getCachePool()
-            ->expects(self::once())
+        $this->cachePool
+            ->expects($this->once())
             ->method('getItem')
             ->with(self::KEY)
             ->willReturn($cacheItem);
 
-        $this->getCachePool()
-            ->expects(self::once())
+        $this->cachePool
+            ->expects($this->once())
             ->method('save')
             ->willReturn(true);
 
         $this->serializer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('serialize')
             ->with($item)
             ->willReturn(self::SERIALIZED);
 
-        $this->getProjectionRepository()->add($item);
+        $this->projectionRepository->add($item);
 
         self::assertEquals(self::SERIALIZED, $cacheItem->get());
-        $this->extraAssertionsForAdd($cacheItem);
+        self::extraAssertionsForAdd($cacheItem);
     }
 
     public function testAddIterable(): void
@@ -57,33 +58,33 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
         $item = (new ProjectionItemIterableStub(self::ID, 'itn'))->storeData(['id' => 'beiga', 'value' => 1000]);
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getItem')
             ->with('test_iterable_id_item')
             ->willReturn($cacheItem);
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('save')
             ->willReturn(true);
 
         $this->serializer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('serialize')
             ->with($item)
-            ->willReturnCallback(fn(ProjectionItemIterableStub $item): string => json_encode([
+            ->willReturnCallback(static fn(ProjectionItemIterableStub $item): string => json_encode([
                 'key'   => $item->getKey(),
                 'stuff' => $item->stuff,
                 'data'  => $item->data(),
             ]));
 
-        $this->getProjectionRepository()->add($item);
+        $this->projectionRepository->add($item);
 
         self::assertEquals(
             '{"key":"test_iterable_id_item","stuff":"itn","data":{"id":"beiga","value":1000}}',
             $cacheItem->get()
         );
-        $this->extraAssertionsForAddIterable($cacheItem);
+        self::extraAssertionsForAddIterable($cacheItem);
     }
 
     public function testAddDeferred(): void
@@ -92,30 +93,30 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
         $item = new ProjectionItemStub(self::ID);
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getItem')
             ->with(self::KEY)
             ->willReturn($cacheItem);
 
         $this->cachePool
-            ->expects(self::never())
+            ->expects($this->never())
             ->method('save');
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('saveDeferred')
             ->willReturn(true);
 
         $this->serializer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('serialize')
             ->with($item)
             ->willReturn(self::SERIALIZED);
 
-        $this->getProjectionRepository()->addDeferred($item);
+        $this->projectionRepository->addDeferred($item);
 
         self::assertEquals(self::SERIALIZED, $cacheItem->get());
-        $this->extraAssertionsForAddDeferred($cacheItem);
+        self::extraAssertionsForAddDeferred($cacheItem);
     }
 
     public function testWhenAddFails(): void
@@ -126,23 +127,23 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
         $item = new ProjectionItemStub(self::ID);
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getItem')
             ->with(self::KEY)
             ->willReturn($this->adaptCacheItem(new CacheItemStub(self::KEY)));
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('save')
             ->willReturn(false);
 
         $this->serializer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('serialize')
             ->with($item)
             ->willReturn(self::SERIALIZED);
 
-        $this->getProjectionRepository()->add($item);
+        $this->projectionRepository->add($item);
     }
 
     public function testWhenAddDeferredFails(): void
@@ -153,27 +154,27 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
         $item = new ProjectionItemStub(self::ID);
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getItem')
             ->with(self::KEY)
             ->willReturn($this->adaptCacheItem(new CacheItemStub(self::KEY)));
 
         $this->cachePool
-            ->expects(self::never())
+            ->expects($this->never())
             ->method('save');
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('saveDeferred')
             ->willReturn(false);
 
         $this->serializer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('serialize')
             ->with($item)
             ->willReturn(self::SERIALIZED);
 
-        $this->getProjectionRepository()->addDeferred($item);
+        $this->projectionRepository->addDeferred($item);
     }
 
     public function testGetExistentItem(): void
@@ -183,18 +184,18 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
         $cacheItem = $this->adaptCacheItem((new CacheItemStub(self::ID))->setHit()->set(self::SERIALIZED));
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getItem')
             ->with($projectionItem->getKey())
             ->willReturn($cacheItem);
 
         $this->serializer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('deserialize')
             ->with(self::SERIALIZED, $projectionItem::class)
             ->willReturn($projectionItemOnCache);
 
-        self::assertEquals($projectionItemOnCache, $this->getProjectionRepository()->get($projectionItem));
+        self::assertEquals($projectionItemOnCache, $this->projectionRepository->get($projectionItem));
     }
 
     public function testGetNonExistentItem(): void
@@ -203,26 +204,26 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
         $cacheItem = $this->adaptCacheItem((new CacheItemStub(self::ID))->setNotHit());
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getItem')
             ->with($projectionItem->getKey())
             ->willReturn($cacheItem);
 
         $this->serializer
-            ->expects(self::never())
+            ->expects($this->never())
             ->method('deserialize');
 
-        self::assertNull($this->getProjectionRepository()->get($projectionItem));
+        self::assertNull($this->projectionRepository->get($projectionItem));
     }
 
     public function testDelete(): void
     {
-        $this->getCachePool()
-            ->expects(self::once())
+        $this->cachePool
+            ->expects($this->once())
             ->method('deleteItem')
             ->willReturn(true);
 
-        $this->getProjectionRepository()->delete(new ProjectionItemStub(self::ID));
+        $this->projectionRepository->delete(new ProjectionItemStub(self::ID));
     }
 
     public function testWhenDeleteFails(): void
@@ -231,21 +232,21 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
         $this->expectExceptionMessage('Not possible to delete projection item on cache pool');
 
         $this->cachePool
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('deleteItem')
             ->willReturn(false);
 
-        $this->getProjectionRepository()->delete(new ProjectionItemStub(self::ID));
+        $this->projectionRepository->delete(new ProjectionItemStub(self::ID));
     }
 
     public function testFlush(): void
     {
-        $this->getCachePool()
-            ->expects(self::once())
+        $this->cachePool
+            ->expects($this->once())
             ->method('commit')
             ->willReturn(true);
 
-        $this->getProjectionRepository()->flush();
+        $this->projectionRepository->flush();
     }
 
     public function testWhenFlushFails(): void
@@ -253,34 +254,35 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
         $this->expectException(ProjectionException::class);
         $this->expectExceptionMessage('Not possible to add projection items on cache pool by flush');
 
-        $this->getCachePool()
-            ->expects(self::once())
+        $this->cachePool
+            ->expects($this->once())
             ->method('commit')
             ->willReturn(false);
 
-        $this->getProjectionRepository()->flush();
+        $this->projectionRepository->flush();
     }
 
-    abstract protected function getCachePool(): MockObject|CacheItemPoolInterface;
+    abstract protected function getCachePool(): MockObject&CacheItemPoolInterface;
 
     abstract protected function getProjectionRepository(): ProjectionRepositoryInterface;
+
+    protected static function extraAssertionsForAdd(CacheItemInterface $cacheItem): void
+    {
+    }
+
+    protected static function extraAssertionsForAddIterable(CacheItemInterface $cacheItem): void
+    {
+    }
+
+    protected static function extraAssertionsForAddDeferred(CacheItemInterface $cacheItem): void
+    {
+    }
 
     protected function setUp(): void
     {
         $this->cachePool = $this->getCachePool();
         $this->serializer = $this->createMock(CacheSerializerInterface::class);
-    }
-
-    protected function extraAssertionsForAdd(CacheItemInterface $cacheItem): void
-    {
-    }
-
-    protected function extraAssertionsForAddIterable(CacheItemInterface $cacheItem): void
-    {
-    }
-
-    protected function extraAssertionsForAddDeferred(CacheItemInterface $cacheItem): void
-    {
+        $this->projectionRepository = $this->getProjectionRepository();
     }
 
     protected function adaptCacheItem(CacheItemInterface $cacheItem): CacheItemInterface

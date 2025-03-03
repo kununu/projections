@@ -35,7 +35,7 @@ interface ProjectionRepositoryInterface
 
 This class implements a repository, which projects the items using [Symfony's Tag Aware Cache Pool component](https://github.com/symfony/symfony/blob/5.4/src/Symfony/Contracts/Cache/TagAwareCacheInterface.php).
 
-This means that then when projecting an [item](docs/projection-item.md), if tags are available for it, the item will also include tags and those items can be invalidated in the cache with the `deleteByTags` method.  
+This means that then when projecting an [item](projection-item.md), if tags are available for it, the item will also include tags and those items can be invalidated in the cache with the `deleteByTags` method.  
 
 ### Psr6CacheProjectionRepository
 
@@ -46,3 +46,7 @@ Unlike the `SymfonyCacheProjectionRepository`, no support for tags is available 
 If your PSR-6 implementation supports tags then is up to you to create an implementation of `ProjectionRepositoryInterface` and make the required changes.
 
 You expand `AbstractProjectionRepository` and do the required changes to `deleteByTags` and `createCacheItem` methods. See `SymfonyCacheProjectionRepository` which does just that. 
+
+---
+
+[Back to Index](../README.md)

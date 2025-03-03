@@ -7,32 +7,36 @@ use Kununu\Projections\ProjectionItemIterableInterface;
 use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Provider\AbstractCachedProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractCachedProviderTestCase extends TestCase
 {
-    protected const METHODS = [];
+    protected const array METHODS = [];
 
-    protected MockObject|ProjectionRepositoryInterface|null $projectionRepository = null;
-    protected MockObject|LoggerInterface|null $logger = null;
+    protected (MockObject&ProjectionRepositoryInterface)|null $projectionRepository = null;
+    protected (MockObject&LoggerInterface)|null $logger = null;
 
     #[DataProvider('getAndCacheDataDataProvider')]
     public function testGetAndCacheData(
-        mixed $originalProvider,
+        object|callable $originalProvider,
         string $method,
         array $args,
         ProjectionItemIterableInterface $item,
         ?ProjectionItemIterableInterface $projectedItem,
         ?iterable $providerData,
         ?iterable $expectedResult = null,
-        ?callable $preProjection = null
+        ?callable $preProjection = null,
     ): void {
+        $provider = match (true) {
+            is_callable($originalProvider) => $originalProvider($this, $this->dataName(), $method, $args),
+            default                        => $originalProvider,
+        };
+
         // Get from cache
         ($repository = $this->getProjectionRepository())
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('get')
             ->with($item)
             ->willReturn($projectedItem);
@@ -47,17 +51,17 @@ abstract class AbstractCachedProviderTestCase extends TestCase
             if ($expectedResult && $itemToProject) {
                 // Add data to the cache
                 $repository
-                    ->expects(self::once())
+                    ->expects($this->once())
                     ->method('add')
                     ->with($itemToProject);
             } else {
                 $repository
-                    ->expects(self::never())
+                    ->expects($this->never())
                     ->method('add');
             }
         }
 
-        $result = call_user_func_array([$this->getProvider($originalProvider), $method], $args);
+        $result = call_user_func_array([$this->getProvider($provider), $method], $args);
 
         self::assertEquals($expectedResult, $result);
     }
@@ -78,32 +82,31 @@ abstract class AbstractCachedProviderTestCase extends TestCase
 
     abstract protected function getProvider(mixed $originalProvider): AbstractCachedProvider;
 
-    protected static function createExternalProvider(
+    protected function createMockedOriginalProvider(
         string $providerClass,
         string $method,
         array $args,
         bool $expected,
-        ?iterable $data
+        ?iterable $data = null,
     ): MockObject {
-        $provider = (new MockBuilder(new static(sprintf('%s::%s', $providerClass, $method)), $providerClass))
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->onlyMethods([$method])
-            ->getMock();
-
-        $invocationMocker = $provider
-            ->expects($expected ? self::once() : self::never())
-            ->method($method)
-            ->with(...$args);
+        $provider = $this->createMock($providerClass);
 
         if ($expected) {
-            $invocationMocker->willReturn($data);
+            $provider
+                ->expects($this->once())
+                ->method($method)
+                ->with(...$args)
+                ->willReturn($data);
+        } else {
+            $provider
+                ->expects($this->never())
+                ->method($method);
         }
 
         return $provider;
     }
 
-    protected function getProjectionRepository(): MockObject|ProjectionRepositoryInterface
+    protected function getProjectionRepository(): MockObject&ProjectionRepositoryInterface
     {
         if (null === $this->projectionRepository) {
             $this->projectionRepository = $this->createMock(ProjectionRepositoryInterface::class);
@@ -112,7 +115,7 @@ abstract class AbstractCachedProviderTestCase extends TestCase
         return $this->projectionRepository;
     }
 
-    protected function getLogger(): MockObject|LoggerInterface
+    protected function getLogger(): MockObject&LoggerInterface
     {
         if (null === $this->logger) {
             $this->logger = $this->createMock(LoggerInterface::class);

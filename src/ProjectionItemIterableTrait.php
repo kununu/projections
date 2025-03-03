@@ -14,7 +14,9 @@ trait ProjectionItemIterableTrait
     public function storeData(iterable $data): ProjectionItemIterableInterface
     {
         if (!is_a($this, ProjectionItemIterableInterface::class)) {
-            throw new BadMethodCallException(sprintf('Class using this trait must be a %s', ProjectionItemIterableInterface::class));
+            throw new BadMethodCallException(
+                sprintf('Class using this trait must be a %s', ProjectionItemIterableInterface::class)
+            );
         }
 
         if (is_array($data)) {

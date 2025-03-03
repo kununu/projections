@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractCacheSerializerTestCase extends TestCase
 {
-    protected const RESULT_FILE = '';
+    protected const string RESULT_FILE = '';
 
     private CacheSerializerInterface $serializer;
     private ProjectionItemIterableStub $item;

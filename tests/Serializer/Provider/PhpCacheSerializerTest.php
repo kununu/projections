@@ -8,7 +8,7 @@ use Kununu\Projections\Serializer\Provider\PhpCacheSerializer;
 
 final class PhpCacheSerializerTest extends AbstractCacheSerializerTestCase
 {
-    protected const RESULT_FILE = 'php.result';
+    protected const string RESULT_FILE = 'php.result';
 
     protected function getSerializer(): CacheSerializerInterface
     {

@@ -18,10 +18,10 @@ final class Psr6CacheProjectionRepositoryTest extends AbstractProjectionReposito
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('PSR-6 does not support tags!');
 
-        $this->getProjectionRepository()->deleteByTags(new Tags(new Tag('tag_1'), new Tag('tag_2')));
+        $this->projectionRepository->deleteByTags(new Tags(new Tag('tag_1'), new Tag('tag_2')));
     }
 
-    protected function getCachePool(): MockObject|CacheItemPoolInterface
+    protected function getCachePool(): MockObject&CacheItemPoolInterface
     {
         if (null === $this->cachePool) {
             $this->cachePool = $this->createMock(CacheItemPoolInterface::class);

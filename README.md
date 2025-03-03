@@ -40,9 +40,10 @@ composer require jms/serializer-bundle
 
 ## Concepts
 
+- [Cache Cleaner](docs/cache-cleaner.md)
 - [Projection Item](docs/projection-item.md)
-- [Repository](docs/repository.md)
 - [Provider](docs/provider.md)
+- [Repository](docs/repository.md)
 - [Serialization](docs/serialization.md)
 
 ## Integrations

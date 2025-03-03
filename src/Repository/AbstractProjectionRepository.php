@@ -15,7 +15,7 @@ abstract class AbstractProjectionRepository implements ProjectionRepositoryInter
 {
     public function __construct(
         protected readonly CacheItemPoolInterface $cachePool,
-        protected readonly CacheSerializerInterface $serializer
+        protected readonly CacheSerializerInterface $serializer,
     ) {
     }
 

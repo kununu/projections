@@ -120,9 +120,9 @@ use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
 
-final class MyProvider
+final readonly class MyProvider
 {
-    public function __construct(private readonly ProjectionRepositoryInterface $projectionRepository)
+    public function __construct(private ProjectionRepositoryInterface $projectionRepository)
     {
     }
 
@@ -155,3 +155,7 @@ final class MyProvider
 ```
 
 Now we can start reading, setting and deleting from the cache pool :)
+
+---
+
+[Back to Index](../README.md)

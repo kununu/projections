@@ -8,7 +8,7 @@ use Kununu\Projections\Serializer\Provider\IgBinaryDeflatedCacheSerializer;
 
 final class IgBinaryDeflatedCacheSerializerTest extends AbstractCacheSerializerTestCase
 {
-    protected const RESULT_FILE = 'igbinary-deflate.result';
+    protected const string RESULT_FILE = 'igbinary-deflate.result';
 
     protected function getSerializer(): CacheSerializerInterface
     {

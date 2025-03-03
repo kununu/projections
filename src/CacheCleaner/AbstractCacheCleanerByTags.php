@@ -13,7 +13,7 @@ abstract class AbstractCacheCleanerByTags implements CacheCleanerInterface
     public function __construct(
         private readonly ProjectionRepositoryInterface $projectionRepository,
         private readonly LoggerInterface $logger,
-        private readonly string $logLevel = LogLevel::INFO
+        private readonly string $logLevel = LogLevel::INFO,
     ) {
     }
 

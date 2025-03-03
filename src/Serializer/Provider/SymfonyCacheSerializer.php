@@ -6,11 +6,11 @@ namespace Kununu\Projections\Serializer\Provider;
 use Kununu\Projections\Serializer\CacheSerializerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final class SymfonyCacheSerializer implements CacheSerializerInterface
+final readonly class SymfonyCacheSerializer implements CacheSerializerInterface
 {
-    private const SERIALIZER_FORMAT = 'json';
+    private const string SERIALIZER_FORMAT = 'json';
 
-    public function __construct(private readonly SerializerInterface $serializer)
+    public function __construct(private SerializerInterface $serializer)
     {
     }
 

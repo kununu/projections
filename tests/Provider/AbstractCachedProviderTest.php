@@ -8,26 +8,25 @@ use Kununu\Projections\Tests\Stubs\ProjectionItem\ProjectionItemIterableStub;
 use Kununu\Projections\Tests\Stubs\Provider\CachedProviderStub;
 use Kununu\Projections\Tests\Stubs\Provider\ProviderStub;
 use Kununu\Projections\Tests\Stubs\Provider\ProviderStubInterface;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
 final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
 {
-    protected const METHODS = [
+    protected const array METHODS = [
         self::METHOD_GET_DATA,
     ];
 
-    private const METHOD_GET_DATA = 'getData';
-    private const ID_1 = '1';
-    private const ID_2 = '2';
-    private const ID_3 = '3';
-    private const DATA = [
+    private const string METHOD_GET_DATA = 'getData';
+    private const string ID_1 = '1';
+    private const string ID_2 = '2';
+    private const string ID_3 = '3';
+    private const array DATA = [
         'id'   => self::ID_1,
         'name' => 'The Name of 1',
         'age'  => 21,
     ];
-    private const DATA_CACHED = [
+    private const array DATA_CACHED = [
         'id'   => self::ID_1,
         'name' => 'The Name of 1 cached',
         'age'  => 21,
@@ -87,6 +86,35 @@ final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
                 'providerData'     => self::DATA_CACHED,
                 'expectedResult'   => self::DATA_CACHED,
             ],
+            'cache_miss_using_mocked_original_provider'                                             => [
+                'originalProvider' => static fn(self $test): MockObject => $test->createMockedOriginalProvider(
+                    providerClass: ProviderStubInterface::class,
+                    method: self::METHOD_GET_DATA,
+                    args: [self::ID_1],
+                    expected: true,
+                    data: self::DATA
+                ),
+                'method'           => self::METHOD_GET_DATA,
+                'args'             => [self::ID_1],
+                'item'             => new ProjectionItemIterableStub(self::ID_1),
+                'projectedItem'    => null,
+                'providerData'     => self::DATA,
+                'expectedResult'   => self::DATA,
+            ],
+            'cache_hit_using_mocked_original_provider'                                              => [
+                'originalProvider' => static fn(self $test): MockObject => $test->createMockedOriginalProvider(
+                    providerClass: ProviderStubInterface::class,
+                    method: self::METHOD_GET_DATA,
+                    args: [self::ID_1],
+                    expected: false
+                ),
+                'method'           => self::METHOD_GET_DATA,
+                'args'             => [self::ID_1],
+                'item'             => new ProjectionItemIterableStub(self::ID_1),
+                'projectedItem'    => (new ProjectionItemIterableStub(self::ID_1))->storeData(self::DATA_CACHED),
+                'providerData'     => self::DATA_CACHED,
+                'expectedResult'   => self::DATA_CACHED,
+            ],
         ];
     }
 
@@ -94,8 +122,9 @@ final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
     {
         $provider = $this->getProvider(new ProviderStub());
 
-        $this->getLogger()
-            ->expects(self::once())
+        $this
+            ->getLogger()
+            ->expects($this->once())
             ->method('log')
             ->with(
                 LogLevel::INFO,
@@ -103,48 +132,19 @@ final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
                 ['cache_key' => 'test_iterable_1', 'class' => CachedProviderStub::class]
             );
 
-        $this->getProjectionRepository()
-            ->expects(self::once())
+        $this
+            ->getProjectionRepository()
+            ->expects($this->once())
             ->method('delete')
             ->with(new ProjectionItemIterableStub(self::ID_1));
 
         $provider->invalidateItem(self::ID_1);
     }
 
-    public function testCreateExternalProviderReturningData(): void
-    {
-        /** @var MockObject|ProviderStubInterface $externalProvider */
-        $externalProvider = self::createExternalProvider(
-            providerClass: ProviderStubInterface::class,
-            method: self::METHOD_GET_DATA,
-            args: [self::ID_1],
-            expected: true,
-            data: self::DATA
-        );
-
-        self::assertEquals(self::DATA, $externalProvider->getData(self::ID_1));
-    }
-
-    public function testCreateExternalProviderNotReturningData(): void
-    {
-        /** @var MockObject|ProviderStubInterface $externalProvider */
-        $externalProvider = self::createExternalProvider(
-            providerClass: ProviderStubInterface::class,
-            method: self::METHOD_GET_DATA,
-            args: [self::ID_1],
-            expected: false,
-            data: null
-        );
-
-        $this->expectException(ExpectationFailedException::class);
-
-        self::assertNull($externalProvider->getData(self::ID_1));
-    }
-
     public function testGetAndCacheDataDataProvider(): void
     {
         $keys = array_map(
-            static fn($key): string => sprintf('getData_%s', $key),
+            static fn(string $key): string => sprintf('getData_%s', $key),
             array_keys(self::getDataDataProvider())
         );
 
@@ -153,6 +153,8 @@ final class AbstractCachedProviderTest extends AbstractCachedProviderTestCase
 
     protected function getProvider(mixed $originalProvider): CachedProviderStub
     {
+        self::assertInstanceOf(ProviderStubInterface::class, $originalProvider);
+
         return new CachedProviderStub($originalProvider, $this->getProjectionRepository(), $this->getLogger());
     }
 }

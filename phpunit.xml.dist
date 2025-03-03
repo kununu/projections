@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- https://docs.phpunit.de/en/10.5/ -->
+<!-- https://docs.phpunit.de/en/11.5/ -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" bootstrap="vendor/autoload.php"
-         colors="true" beStrictAboutChangesToGlobalState="true" cacheDirectory=".phpunit.cache" testdox="true">
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd" bootstrap="vendor/autoload.php"
+         colors="true" beStrictAboutChangesToGlobalState="true" testdoxSummary="true" testdox="true"
+         cacheDirectory=".phpunit.cache">
   <coverage>
     <report>
       <clover outputFile="tests/.results/tests-clover.xml"/>
@@ -10,7 +11,7 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="Projections Test Suite">
+    <testsuite name="Full">
       <directory>tests</directory>
     </testsuite>
   </testsuites>

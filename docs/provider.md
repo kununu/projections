@@ -77,7 +77,6 @@ final class MyCachedProvider extends AbstractCachedProvider implements MyProvide
         LoggerInterface $logger
     ) {
         parent::__construct($projectionRepository, $logger);
-        $this->myProvider = $myProvider;
     }
     
     public function getCustomerData(int $customerId): ?iterable
@@ -121,16 +120,16 @@ $cachedProvider = new MyCachedProvider($myProvider, $projectionRepository, $logg
 $data = $cachedProvider->getCustomerData(152);
 ```
 
-### CachedProviderTestCase
+### AbstractCachedProviderTestCase
 
-In order to help you unit testing your cached providers implementations the `CachedProviderTestCase` exists for that purpose.
+In order to help you unit testing your cached providers implementations the `AbstractCachedProviderTestCase` exists for that purpose.
 
 Just make you test class extend it and override the `METHODS` constant and implement the `getProvider` method.
 
 The `getProvider` is where you should create the "decorated" cached provider you want to test. E.g:
 
 ```php
-protected function getProvider(mixed $originalProvider): AbstractCachedProvider
+protected function getProvider(object $originalProvider): AbstractCachedProvider
 {
     return new MyCachedProvider($originalProvider, $this->getProjectionRepository(), $this->getLogger());
 }
@@ -138,14 +137,14 @@ protected function getProvider(mixed $originalProvider): AbstractCachedProvider
 
 You don't need to mock the projection repository neither the logger. Just create an instance of your cached provider.
 
-The `$originalProvider` will be an instance/mock of your original provider.
+The `$originalProvider` will be an instance/mock of your **original** provider (e.g. the non-cached version).
 
 The `METHODS` constant should contain the methods of your provider class.
 
 For our example above to test the `getCustomerData` method:
 
 ```php
-protected const METHODS = [
+protected const array METHODS = [
     'getCustomerData',
 ];
 ```
@@ -185,15 +184,15 @@ public static function getCustomerDataDataProvider(): array
 }
 ```
 
-If you want to mock the original provider you can do it with the `createExternalProvider`:
+If you want to mock the original provider you can do it with the `createMockedOriginalProvider`:
 
 ```php
-protected static function createExternalProvider(
+protected function createMockedOriginalProvider(
     string $providerClass,
     string $method,
     array $args,
     bool $expected,
-    ?iterable $data
+    ?iterable $data = null
 ): MockObject
 ```
 
@@ -206,7 +205,7 @@ protected static function createExternalProvider(
 Example:
 
 ```php
-$originalProvider = self::createExternalProvider(
+$originalProvider = $this->createExternalProvider(
     MyProviderInterface::class,
     'getCustomerData',
     [123],
@@ -217,3 +216,65 @@ $originalProvider = self::createExternalProvider(
     ]
 );
 ```
+
+Also, since PHPUnit data provider methods are static you will need to call this method inside a callable.
+
+That callable will be the "originalDataProvider" parameter that will be executed inside the test to create the mock.
+
+The format of the callable is:
+
+```php
+function(self $test, string $dataName, string $method, array $args): MockObject
+```
+
+So it will pass the current test class (which you can use to create the mock objects), the current test data name as well the method being tested and its arguments.
+
+Then in you callable function you can call the `createMockedOriginalProvider` (or create it manually, it's up to you).
+
+Example:
+
+```php
+public static function getCustomerDataDataProvider(): array
+{
+    return [
+        'my_test_case_1' => [
+            // In this example I also want to mock the original provider
+            // For this example I will ignore the extra arguments as I will only use the current test class instance
+            $originalProvider => static fn(self $test): MockObject => $test->createMockedOriginalProvider(
+                    providerClass: MyProviderInterface::class,
+                    method: 'getCustomerData',
+                    args: [123],
+                    expected: true,
+                    data: [
+                        'id' => 123,
+                        'name' => 'My Customer Name'
+                    ]
+                )
+            $method, // Should be 'getCustomerData' as this is a test case for that method
+            $args, // Arguments to your method (int this case: [123 <- $customerId])
+            $item, // Projection item to search in cache (e.g. new CustomerByIdProjectionItem(123))
+            $projectedItem, // Projected item to be return by the projection repository (null to simulate a cache miss)
+            $providerData, // Data the original provider will return
+            $providerData, // Expected result
+            // Optional, by default is null and only required when you are doing manipulations on your cached provider
+            // before projecting the item to the cache.
+            //
+            // To test this cases you can change the item as you expect it before doing the projection
+            // The $item received here is a clone of the $item defined above and if $providerData is iterable it
+            // is already injected in the item via the storeData method
+            function($itemToProject) {
+                // Do something to the item before adding it to the cache
+                // E.g. set a property on the item that usually is set on the pre-projection callables of the
+                // getAndCacheData method of the cached provider              
+                $itemToProject->setField('a value');
+
+                return $itemToProject;
+            }
+        ]
+    ]; 
+}
+```
+
+---
+
+[Back to Index](../README.md)

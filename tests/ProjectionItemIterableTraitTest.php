@@ -14,7 +14,7 @@ final class ProjectionItemIterableTraitTest extends TestCase
 {
     public function testTrait(): void
     {
-        $validClass = new class() implements ProjectionItemIterableInterface {
+        $validClass = new class implements ProjectionItemIterableInterface {
             use ProjectionItemIterableTrait;
 
             public function getKey(): string
@@ -40,7 +40,7 @@ final class ProjectionItemIterableTraitTest extends TestCase
 
         self::assertEquals(['a', 'b', 5], $validClass->data());
 
-        $invalidClass = new class() {
+        $invalidClass = new class {
             use ProjectionItemIterableTrait;
         };
 

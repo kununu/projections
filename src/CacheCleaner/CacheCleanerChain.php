@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Kununu\Projections\CacheCleaner;
 
-final class CacheCleanerChain implements CacheCleanerInterface
+final readonly class CacheCleanerChain implements CacheCleanerInterface
 {
-    /** @var CacheCleanerInterface[] */
-    private readonly array $cacheCleaners;
+    /** @var array<CacheCleanerInterface> */
+    private array $cacheCleaners;
 
     public function __construct(CacheCleanerInterface ...$cacheCleaners)
     {
