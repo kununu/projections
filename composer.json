@@ -34,7 +34,7 @@
     "symfony/yaml": "^6.4",
     "symfony/cache": "^6.4",
     "jms/serializer": "^3.28",
-    "symfony/serializer": "^6.4",
+    "symfony/serializer": "^6.4 || ^7.0",
     "symfony/property-access": "^6.4"
   },
   "suggest": {
