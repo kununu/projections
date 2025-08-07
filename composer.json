@@ -1,9 +1,8 @@
 {
   "name": "kununu/projections",
   "description": "Handle projections of items to cache",
-  "type": "library",
   "license": "MIT",
-  "minimum-stability": "stable",
+  "type": "library",
   "keywords": [
     "cache",
     "projections",
@@ -23,19 +22,20 @@
     "php": ">=8.3"
   },
   "require-dev": {
-    "ext-json": "*",
     "ext-igbinary": "*",
+    "ext-json": "*",
     "ext-zlib": "*",
-    "kununu/scripts": ">=5.1",
+    "jms/serializer": "^3.28",
+    "kununu/scripts": ">=6.1",
     "phpstan/phpstan": "^2.1",
     "phpstan/phpstan-phpunit": "^2.0",
-    "phpunit/phpunit": "^11.5",
+    "phpunit/phpunit": "^12.3",
     "rector/rector": "^2.0",
-    "symfony/yaml": "^6.4",
+    "shipmonk/composer-dependency-analyser": "^1.8",
     "symfony/cache": "^6.4",
-    "jms/serializer": "^3.28",
+    "symfony/property-access": "^6.4",
     "symfony/serializer": "^6.4",
-    "symfony/property-access": "^6.4"
+    "symfony/yaml": "^6.4"
   },
   "suggest": {
     "ext-igbinary": "To use IgBinary cache serializers",
@@ -45,6 +45,7 @@
     "symfony/property-access": "To use Symfony Serializer cache serializers",
     "symfony/serializer": "To use Symfony Serializer cache serializers"
   },
+  "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
       "Kununu\\Projections\\": "src/"
@@ -55,21 +56,23 @@
       "Kununu\\Projections\\Tests\\": "tests/"
     }
   },
-  "scripts": {
-    "test": "phpunit --no-coverage --no-logging --no-progress",
-    "test-coverage": "XDEBUG_MODE=coverage phpunit",
-    "rector": "rector process --dry-run --config rector-ci.php src/ tests/",
-    "phpstan": "phpstan"
-  },
-  "scripts-descriptions": {
-    "test": "Run all tests",
-    "test-coverage": "Run all tests with coverage report",
-    "rector": "Run Rector in dry-run mode with CI rules",
-    "phpstan": "Run PHPStan"
-  },
   "config": {
     "allow-plugins": {
       "kununu/scripts": true
     }
+  },
+  "scripts": {
+    "cs": "composer kununu:cs-fixer-code src/ tests/",
+    "phpstan": "phpstan",
+    "rector": "rector process --dry-run --config rector-ci.php src/ tests/",
+    "test": "phpunit --no-coverage --no-logging --no-progress",
+    "test-coverage": "XDEBUG_MODE=coverage phpunit"
+  },
+  "scripts-descriptions": {
+    "cs": "Run PHP CS Fixer with kununu code standards",
+    "phpstan": "Run PHPStan",
+    "rector": "Run Rector in dry-run mode with CI rules",
+    "test": "Run all tests",
+    "test-coverage": "Run all tests with coverage report"
   }
 }

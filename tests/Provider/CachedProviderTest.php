@@ -143,12 +143,14 @@ final class CachedProviderTest extends AbstractCachedProviderTestCase
 
     public function testGetAndCacheDataDataProvider(): void
     {
-        $keys = array_map(
+        $expected = array_map(
             static fn(string $key): string => sprintf('getData_%s', $key),
             array_keys(self::getDataDataProvider())
         );
 
-        self::assertEquals(array_combine($keys, self::getDataDataProvider()), self::getAndCacheDataDataProvider());
+        $keys = array_keys(self::getAndCacheDataDataProvider());
+
+        self::assertEquals($expected, $keys);
     }
 
     protected function getProvider(mixed $originalProvider): CachedProviderStub

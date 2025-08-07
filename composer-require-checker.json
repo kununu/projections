@@ -1,0 +1,20 @@
+{
+  "symbol-whitelist": [
+    "gzdeflate",
+    "gzinflate",
+    "igbinary_serialize",
+    "igbinary_unserialize",
+    "JMS\\Serializer\\Annotation\\Type",
+    "JMS\\Serializer\\SerializerInterface",
+    "PHPUnit\\Framework\\Attributes\\DataProvider",
+    "PHPUnit\\Framework\\MockObject\\MockObject",
+    "PHPUnit\\Framework\\TestCase",
+    "Psr\\Cache\\CacheItemInterface",
+    "Psr\\Cache\\CacheItemPoolInterface",
+    "Psr\\Log\\LoggerInterface",
+    "Psr\\Log\\LogLevel",
+    "Symfony\\Component\\Cache\\Adapter\\TagAwareAdapterInterface",
+    "Symfony\\Component\\Cache\\CacheItem",
+    "Symfony\\Component\\Serializer\\SerializerInterface"
+  ]
+}
