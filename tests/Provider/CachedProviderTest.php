@@ -8,9 +8,11 @@ use Kununu\Projections\Tests\Stubs\ProjectionItem\ProjectionItemIterableStub;
 use Kununu\Projections\Tests\Stubs\Provider\CachedProviderStub;
 use Kununu\Projections\Tests\Stubs\Provider\ProviderStub;
 use Kununu\Projections\Tests\Stubs\Provider\ProviderStubInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
+#[AllowMockObjectsWithoutExpectations]
 final class CachedProviderTest extends AbstractCachedProviderTestCase
 {
     protected const array METHODS = [
@@ -65,7 +67,7 @@ final class CachedProviderTest extends AbstractCachedProviderTestCase
                 'projectedItem'    => null,
                 'providerData'     => self::DATA,
                 'expectedResult'   => null,
-                'preProjection'    => fn() => null,
+                'preProjection'    => static fn() => null,
             ],
             'cache_miss_and_no_data_from_external_provider'                                         => [
                 'originalProvider' => $originalProvider,
@@ -82,7 +84,7 @@ final class CachedProviderTest extends AbstractCachedProviderTestCase
                 'method'           => self::METHOD_GET_DATA,
                 'args'             => [self::ID_1],
                 'item'             => new ProjectionItemIterableStub(self::ID_1),
-                'projectedItem'    => (new ProjectionItemIterableStub(self::ID_1))->storeData(self::DATA_CACHED),
+                'projectedItem'    => new ProjectionItemIterableStub(self::ID_1)->storeData(self::DATA_CACHED),
                 'providerData'     => self::DATA_CACHED,
                 'expectedResult'   => self::DATA_CACHED,
             ],
@@ -111,7 +113,7 @@ final class CachedProviderTest extends AbstractCachedProviderTestCase
                 'method'           => self::METHOD_GET_DATA,
                 'args'             => [self::ID_1],
                 'item'             => new ProjectionItemIterableStub(self::ID_1),
-                'projectedItem'    => (new ProjectionItemIterableStub(self::ID_1))->storeData(self::DATA_CACHED),
+                'projectedItem'    => new ProjectionItemIterableStub(self::ID_1)->storeData(self::DATA_CACHED),
                 'providerData'     => self::DATA_CACHED,
                 'expectedResult'   => self::DATA_CACHED,
             ],

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- https://docs.phpunit.de/en/12.3/ -->
+<!-- https://docs.phpunit.de/en/12.5/ -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.3/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
-         colors="true"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.5/phpunit.xsd"
          beStrictAboutChangesToGlobalState="true"
+         bootstrap="vendor/autoload.php"
+         cacheDirectory=".phpunit.cache"
+         colors="true"
+         displayDetailsOnAllIssues="true"
          testdoxSummary="true"
-         testdox="true"
-         cacheDirectory=".phpunit.cache">
+         testdox="true">
     <coverage>
         <report>
             <clover outputFile="tests/.results/tests-clover.xml"/>

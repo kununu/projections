@@ -41,7 +41,7 @@ final class SimpleCachedProviderTestTraitTest extends TestCase
             self::METHOD,
             $expectCacheMiss,
             new ProjectionItemIterableStub(self::ID),
-            (new ProjectionItemIterableStub(self::ID))->storeData(self::RESULT),
+            new ProjectionItemIterableStub(self::ID)->storeData(self::RESULT),
             $originalResult
         );
 
@@ -76,7 +76,7 @@ final class SimpleCachedProviderTestTraitTest extends TestCase
         $this->provider = new CachedProviderStub(
             $this->originalProvider,
             $this->projectionRepository,
-            $this->createMock(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class)
         );
     }
 }

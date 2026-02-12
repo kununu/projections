@@ -9,8 +9,10 @@ use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Tag\ProjectionTagGenerator;
 use Kununu\Projections\Tag\Tags;
 use Kununu\Projections\TestCase\CacheCleaner\AbstractCacheCleanerTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Psr\Log\LoggerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class AbstractCacheCleanerByTagsTest extends AbstractCacheCleanerTestCase
 {
     protected const array TAGS = ['my-tag1', 'my-tag2'];
