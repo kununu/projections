@@ -114,7 +114,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: build-8.4-highest-coverage
+          name: tests-8.4-highest-coverage
           path: tests/.results/
 
       - name: Fix Code Coverage Paths
