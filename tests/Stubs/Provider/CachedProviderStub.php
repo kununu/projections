@@ -24,7 +24,7 @@ final class CachedProviderStub extends AbstractCachedProvider implements Provide
         return $this->getAndCacheData(
             new ProjectionItemIterableStub($id),
             fn(): ?iterable => $this->provider->getData($id),
-            function(ProjectionItemIterableInterface $item, iterable $data): ?iterable {
+            static function(ProjectionItemIterableInterface $item, iterable $data): ?iterable {
                 assert($item instanceof ProjectionItemIterableStub);
 
                 return $item->getKey() === 'test_iterable_2'

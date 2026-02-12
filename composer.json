@@ -19,23 +19,33 @@
     }
   ],
   "require": {
-    "php": ">=8.3"
+    "php": ">=8.4"
   },
   "require-dev": {
     "ext-igbinary": "*",
     "ext-json": "*",
     "ext-zlib": "*",
     "jms/serializer": "^3.28",
-    "kununu/code-tools": "^3.1",
+    "kununu/code-tools": "^4.0",
     "phpstan/phpstan": "^2.1",
     "phpstan/phpstan-phpunit": "^2.0",
-    "phpunit/phpunit": "^12.3",
+    "phpunit/phpunit": "^12.5",
     "rector/rector": "^2.0",
     "shipmonk/composer-dependency-analyser": "^1.8",
-    "symfony/cache": "^6.4",
-    "symfony/property-access": "^6.4",
-    "symfony/serializer": "^6.4",
-    "symfony/yaml": "^6.4"
+    "symfony/cache": "^6.4 || ^7.4",
+    "symfony/property-access": "^6.4 || ^7.4",
+    "symfony/serializer": "^6.4 || ^7.4",
+    "symfony/yaml": "^6.4 || ^7.4"
+  },
+  "conflict": {
+    "symfony/event-dispatcher": "<6.4",
+    "symfony/filesystem": "<6.4",
+    "symfony/finder": "<6.4",
+    "symfony/options-resolver": "<6.4",
+    "symfony/property-info": "<6.4",
+    "symfony/stopwatch": "<6.4",
+    "symfony/string": "<6.4",
+    "symfony/var-exporter": "<6.4"
   },
   "suggest": {
     "ext-igbinary": "To use IgBinary cache serializers",
@@ -65,6 +75,8 @@
     "cs": "composer kununu:cs-fixer src/ tests/",
     "phpstan": "phpstan",
     "rector": "rector process --dry-run --config rector-ci.php src/ tests/",
+    "rector-fix": "rector process --config rector-ci.php src/ tests/",
+    "sniffer": "phpcs",
     "test": "phpunit --no-coverage --no-logging --no-progress",
     "test-coverage": "XDEBUG_MODE=coverage phpunit"
   },
@@ -72,6 +84,8 @@
     "cs": "Run PHP CS Fixer with kununu code standards",
     "phpstan": "Run PHPStan",
     "rector": "Run Rector in dry-run mode with CI rules",
+    "rector-fix": "rector process --config rector-ci.php src/ tests/",
+    "sniffer": "Run PHP_CodeSniffer",
     "test": "Run all tests",
     "test-coverage": "Run all tests with coverage report"
   }

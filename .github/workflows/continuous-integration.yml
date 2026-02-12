@@ -24,9 +24,9 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.4
           coverage: none
-          tools: composer-dependency-analyser, composer-normalize, composer-require-checker
+          tools: composer-dependency-analyser, composer-normalize, composer-require-checker, cs2pr
 
       - name: Install Composer Dependencies
         uses: ramsey/composer-install@v3
@@ -46,20 +46,27 @@ jobs:
       - name: Run PHP CS Fixer
         run: vendor/bin/php-cs-fixer check --using-cache=no --config vendor/kununu/code-tools/php-cs-fixer.php src/ tests/
 
+      - name: Run PHP_CodeSniffer
+        id: php-code-sniffer
+        run: vendor/bin/phpcs --report-full --report-checkstyle=./phpcs-report.xml --colors src/ tests/
+
+      - name: Show PHP_CodeSniffer results in PR
+        if: ${{ always() && steps.php-code-sniffer.outcome == 'failure' }}
+        run: cs2pr ./phpcs-report.xml
+
       - name: Run Rector
         run: vendor/bin/rector process --ansi --dry-run --config rector-ci.php src/ tests/
 
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse --ansi
 
-  build:
+  tests:
     needs: checks
-    name: PHPUnit
+    name: Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
         php-version:
-          - 8.3
           - 8.4
         dependencies:
           - lowest
@@ -83,7 +90,7 @@ jobs:
           dependency-versions: ${{ matrix.dependencies }}
           composer-options: "--prefer-stable --optimize-autoloader --no-progress --no-interaction"
 
-      - name: Run PHPUnit
+      - name: Run tests with coverage
         run: |
           vendor/bin/phpunit --colors=always --testdox \
             --log-junit tests/.results/tests-junit.xml \
@@ -96,9 +103,9 @@ jobs:
           include-hidden-files: true
           path: tests/.results/
 
-  sonarcloud:
-    needs: build
-    name: SonarCloud Checks
+  code_analysis:
+    needs: tests
+    name: Code Analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -107,7 +114,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: build-8.3-highest-coverage
+          name: tests-8.4-highest-coverage
           path: tests/.results/
 
       - name: Fix Code Coverage Paths
@@ -117,7 +124,7 @@ jobs:
           sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' tests-junit.xml
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v6.0.0
+        uses: SonarSource/sonarqube-scan-action@v7.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

@@ -55,7 +55,7 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
     public function testAddIterable(): void
     {
         $cacheItem = $this->adaptCacheItem(new CacheItemStub(self::ID));
-        $item = (new ProjectionItemIterableStub(self::ID, 'itn'))->storeData(['id' => 'beiga', 'value' => 1000]);
+        $item = new ProjectionItemIterableStub(self::ID, 'itn')->storeData(['id' => 'beiga', 'value' => 1000]);
 
         $this->cachePool
             ->expects($this->once())
@@ -181,7 +181,7 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
     {
         $projectionItem = new ProjectionItemStub(self::ID);
         $projectionItemOnCache = new ProjectionItemStub(self::ID);
-        $cacheItem = $this->adaptCacheItem((new CacheItemStub(self::ID))->setHit()->set(self::SERIALIZED));
+        $cacheItem = $this->adaptCacheItem(new CacheItemStub(self::ID)->setHit()->set(self::SERIALIZED));
 
         $this->cachePool
             ->expects($this->once())
@@ -201,7 +201,7 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
     public function testGetNonExistentItem(): void
     {
         $projectionItem = new ProjectionItemStub(self::ID);
-        $cacheItem = $this->adaptCacheItem((new CacheItemStub(self::ID))->setNotHit());
+        $cacheItem = $this->adaptCacheItem(new CacheItemStub(self::ID)->setNotHit());
 
         $this->cachePool
             ->expects($this->once())

@@ -8,9 +8,11 @@ use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Repository\Psr6CacheProjectionRepository;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemPoolInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class Psr6CacheProjectionRepositoryTest extends AbstractProjectionRepositoryTestCase
 {
     public function testDeleteByTags(): void
