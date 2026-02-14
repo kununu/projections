@@ -33,7 +33,7 @@
     "rector/rector": "^2.0",
     "shipmonk/composer-dependency-analyser": "^1.8",
     "symfony/cache": "^6.4 || ^7.4",
-    "symfony/property-access": "^6.4 || ^7.4",
+    "symfony/property-access": "^6.4 || ^7.4 || ^8.0",
     "symfony/serializer": "^6.4 || ^7.4",
     "symfony/yaml": "^6.4 || ^7.4"
   },
