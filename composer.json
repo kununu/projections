@@ -34,7 +34,7 @@
     "shipmonk/composer-dependency-analyser": "^1.8",
     "symfony/cache": "^6.4 || ^7.4",
     "symfony/property-access": "^6.4 || ^7.4",
-    "symfony/serializer": "^6.4 || ^7.4",
+    "symfony/serializer": "^6.4 || ^7.4 || ^8.0",
     "symfony/yaml": "^6.4 || ^7.4"
   },
   "conflict": {
