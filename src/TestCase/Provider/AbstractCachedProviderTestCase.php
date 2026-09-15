@@ -108,18 +108,14 @@ abstract class AbstractCachedProviderTestCase extends TestCase
 
     protected function getProjectionRepository(): MockObject&ProjectionRepositoryInterface
     {
-        if (null === $this->projectionRepository) {
-            $this->projectionRepository = $this->createMock(ProjectionRepositoryInterface::class);
-        }
+        $this->projectionRepository ??= $this->createMock(ProjectionRepositoryInterface::class);
 
         return $this->projectionRepository;
     }
 
     protected function getLogger(): MockObject&LoggerInterface
     {
-        if (null === $this->logger) {
-            $this->logger = $this->createMock(LoggerInterface::class);
-        }
+        $this->logger ??= $this->createMock(LoggerInterface::class);
 
         return $this->logger;
     }

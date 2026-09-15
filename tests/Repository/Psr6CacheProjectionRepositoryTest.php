@@ -8,26 +8,25 @@ use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Repository\Psr6CacheProjectionRepository;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemPoolInterface;
 
-#[AllowMockObjectsWithoutExpectations]
 final class Psr6CacheProjectionRepositoryTest extends AbstractProjectionRepositoryTestCase
 {
     public function testDeleteByTags(): void
     {
+        $this->expectsCachePoolNotToBeInvoked();
+        $this->expectsSerializerNotToBeInvoked();
+
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('PSR-6 does not support tags!');
+        $this->expectExceptionMessageIs('PSR-6 does not support tags!');
 
         $this->projectionRepository->deleteByTags(new Tags(new Tag('tag_1'), new Tag('tag_2')));
     }
 
     protected function getCachePool(): MockObject&CacheItemPoolInterface
     {
-        if (null === $this->cachePool) {
-            $this->cachePool = $this->createMock(CacheItemPoolInterface::class);
-        }
+        $this->cachePool ??= $this->createMock(CacheItemPoolInterface::class);
 
         return $this->cachePool;
     }

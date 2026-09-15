@@ -122,7 +122,7 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
     public function testWhenAddFails(): void
     {
         $this->expectException(ProjectionException::class);
-        $this->expectExceptionMessage('Not possible to add projection item on cache pool');
+        $this->expectExceptionMessageIs('Not possible to add projection item on cache pool');
 
         $item = new ProjectionItemStub(self::ID);
 
@@ -149,7 +149,7 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
     public function testWhenAddDeferredFails(): void
     {
         $this->expectException(ProjectionException::class);
-        $this->expectExceptionMessage('Not possible to save deferred projection item on cache pool');
+        $this->expectExceptionMessageIs('Not possible to save deferred projection item on cache pool');
 
         $item = new ProjectionItemStub(self::ID);
 
@@ -218,6 +218,8 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
 
     public function testDelete(): void
     {
+        $this->expectsSerializerNotToBeInvoked();
+
         $this->cachePool
             ->expects($this->once())
             ->method('deleteItem')
@@ -228,8 +230,10 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
 
     public function testWhenDeleteFails(): void
     {
+        $this->expectsSerializerNotToBeInvoked();
+
         $this->expectException(ProjectionException::class);
-        $this->expectExceptionMessage('Not possible to delete projection item on cache pool');
+        $this->expectExceptionMessageIs('Not possible to delete projection item on cache pool');
 
         $this->cachePool
             ->expects($this->once())
@@ -241,6 +245,8 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
 
     public function testFlush(): void
     {
+        $this->expectsSerializerNotToBeInvoked();
+
         $this->cachePool
             ->expects($this->once())
             ->method('commit')
@@ -251,8 +257,10 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
 
     public function testWhenFlushFails(): void
     {
+        $this->expectsSerializerNotToBeInvoked();
+
         $this->expectException(ProjectionException::class);
-        $this->expectExceptionMessage('Not possible to add projection items on cache pool by flush');
+        $this->expectExceptionMessageIs('Not possible to add projection items on cache pool by flush');
 
         $this->cachePool
             ->expects($this->once())
@@ -288,5 +296,31 @@ abstract class AbstractProjectionRepositoryTestCase extends TestCase
     protected function adaptCacheItem(CacheItemInterface $cacheItem): CacheItemInterface
     {
         return $cacheItem;
+    }
+
+    protected function expectsCachePoolNotToBeInvoked(): void
+    {
+        $this->expectsMethodsNeverToBeCalled(
+            $this->cachePool,
+            'commit',
+            'deleteItem',
+            'getItem',
+            'save',
+            'saveDeferred'
+        );
+    }
+
+    protected function expectsSerializerNotToBeInvoked(): void
+    {
+        $this->expectsMethodsNeverToBeCalled($this->serializer, 'deserialize', 'serialize');
+    }
+
+    protected function expectsMethodsNeverToBeCalled(MockObject $mockObject, string ...$methods): void
+    {
+        foreach ($methods as $method) {
+            $mockObject
+                ->expects($this->never())
+                ->method($method);
+        }
     }
 }
