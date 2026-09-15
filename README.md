@@ -49,6 +49,11 @@ composer require jms/serializer-bundle
 ## Integrations
 - [Symfony Integrations](docs/symfony.md)
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, quality gates, and
+the pull request process.
+
 ------------------------------
 
 ![Continuous Integration](https://github.com/kununu/projections/actions/workflows/continuous-integration.yml/badge.svg)
