@@ -9,18 +9,18 @@ use Kununu\Projections\ProjectionRepositoryInterface;
 use Kununu\Projections\Repository\SymfonyCacheProjectionRepository;
 use Kununu\Projections\Tag\Tag;
 use Kununu\Projections\Tag\Tags;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 
-#[AllowMockObjectsWithoutExpectations]
 final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepositoryTestCase
 {
     public function testDeleteByTags(): void
     {
+        $this->expectsSerializerNotToBeInvoked();
+
         $this->cachePool
             ->expects($this->once())
             ->method('invalidateTags')
@@ -32,8 +32,10 @@ final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepos
 
     public function testWhenDeleteByTagsFails(): void
     {
+        $this->expectsSerializerNotToBeInvoked();
+
         $this->expectException(ProjectionException::class);
-        $this->expectExceptionMessage('Not possible to delete projection items on cache pool based on tag');
+        $this->expectExceptionMessageIs('Not possible to delete projection items on cache pool based on tag');
 
         $this->cachePool
             ->expects($this->once())
@@ -60,9 +62,7 @@ final class SymfonyCacheProjectionRepositoryTest extends AbstractProjectionRepos
 
     protected function getCachePool(): MockObject&CacheItemPoolInterface
     {
-        if (null === $this->cachePool) {
-            $this->cachePool = $this->createMock(TagAwareAdapterInterface::class);
-        }
+        $this->cachePool ??= $this->createMock(TagAwareAdapterInterface::class);
 
         return $this->cachePool;
     }

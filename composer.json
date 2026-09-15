@@ -25,12 +25,11 @@
     "ext-igbinary": "*",
     "ext-json": "*",
     "ext-zlib": "*",
+    "ergebnis/composer-normalize": "^2.53",
     "jms/serializer": "^3.28",
-    "kununu/code-tools": "^4.0",
-    "phpstan/phpstan": "^2.1",
-    "phpstan/phpstan-phpunit": "^2.0",
-    "phpunit/phpunit": "^13.1",
-    "rector/rector": "^2.4",
+    "kununu/code-tools": "^5.1",
+    "maglnet/composer-require-checker": "^4.20",
+    "phpunit/phpunit": "^13.3",
     "shipmonk/composer-dependency-analyser": "^1.8",
     "symfony/cache": "^6.4 || ^7.4",
     "symfony/property-access": "^6.4 || ^7.4",
@@ -68,21 +67,52 @@
   },
   "config": {
     "allow-plugins": {
+      "ergebnis/composer-normalize": true,
       "kununu/code-tools": true
     }
   },
   "scripts": {
+    "ci": [
+      "print-section 'Security Audit'",
+      "composer audit --abandoned=report",
+      "print-section 'Dependency Analyser'",
+      "composer-dependency-analyser",
+      "print-section 'Composer Require Checker'",
+      "composer-require-checker",
+      "print-section 'Composer Normalize'",
+      "composer normalize --dry-run --indent-size 2 --indent-style space --no-check-lock --no-update-lock",
+      "print-section 'PHP CS Fixer'",
+      "@cs",
+      "print-section 'PHP CodeSniffer'",
+      "@sniffer",
+      "print-section 'Rector'",
+      "@rector",
+      "print-section 'PHPStan'",
+      "@phpstan",
+      "print-section 'Tests & Coverage'",
+      "@test-coverage",
+      "print-section 'Coverage Check'",
+      "@coverage-check"
+    ],
+    "coverage-check": "coverage-check tests/.results/tests-cobertura.xml 95",
     "cs": "composer kununu:cs-fixer src/ tests/",
+    "normalize-fix": "composer normalize --indent-size 2 --indent-style space --no-check-lock --no-update-lock",
     "phpstan": "phpstan",
     "rector": "rector process --dry-run --config rector-ci.php src/ tests/",
     "rector-fix": "rector process --config rector-ci.php src/ tests/",
     "sniffer": "phpcs",
     "sniffer-fix": "phpcbf",
     "test": "phpunit --testsuite Full --testdox --testdox-summary --no-coverage --no-logging",
-    "test-coverage": "XDEBUG_MODE=coverage phpunit --testsuite Full --testdox --testdox-summary --log-junit tests/.results/tests-junit.xml --coverage-clover tests/.results/tests-clover.xml --coverage-html tests/.results/html/"
+    "test-coverage": [
+      "@putenv XDEBUG_MODE=coverage",
+      "@php -d zend.assertions=1 vendor/bin/phpunit --testsuite Full --testdox --testdox-summary --log-junit tests/.results/tests-junit.xml --coverage-clover tests/.results/tests-clover.xml --coverage-cobertura tests/.results/tests-cobertura.xml --coverage-html tests/.results/html/"
+    ]
   },
   "scripts-descriptions": {
+    "ci": "Run all CI checks",
+    "coverage-check": "Check that the line coverage of the last coverage run is at least 95%",
     "cs": "Run PHP CS Fixer with kununu code standards",
+    "normalize-fix": "Normalizes the composer.json file",
     "phpstan": "Run PHPStan",
     "rector": "Run Rector in dry-run mode with CI rules",
     "rector-fix": "Run Rector in fix mode with CI rules",

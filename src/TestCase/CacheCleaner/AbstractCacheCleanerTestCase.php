@@ -60,7 +60,7 @@ abstract class AbstractCacheCleanerTestCase extends TestCase
             );
 
         $this->expectException(ProjectionException::class);
-        $this->expectExceptionMessage('Not possible to delete projection items on cache pool based on tag');
+        $this->expectExceptionMessageIs('Not possible to delete projection items on cache pool based on tag');
 
         $this->cacheCleaner->clear();
     }
@@ -75,7 +75,7 @@ abstract class AbstractCacheCleanerTestCase extends TestCase
         $this->cachePool = $this->createMock(TagAwareAdapterInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->cacheCleaner = $this->getCacheCleaner(
-            new SymfonyCacheProjectionRepository($this->cachePool, $this->createMock(CacheSerializerInterface::class)),
+            new SymfonyCacheProjectionRepository($this->cachePool, self::createStub(CacheSerializerInterface::class)),
             $this->logger
         );
     }
